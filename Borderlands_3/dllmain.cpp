@@ -15,6 +15,8 @@ Console* con = nullptr;
 
 std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
+CG::UGameInstance* GameInstance = nullptr;
+CG::ULocalPlayer* LocalPlayer = nullptr;
 float speedVal = 5.0f;
 
 int post_render_index = 0x63;
@@ -26,11 +28,44 @@ fn oPostRender = 0;
 CG::UFont* GlobalFont = nullptr;
 
 CG::FLinearColor Cyan = { 0.f, 1.f, 1.f, 1.f };
+
 CG::FLinearColor Black = { 0.f, 0.f, 0.f, 1.f };
 CG::FLinearColor White = { 1.f, 1.f, 1.f, 1.f };
 
+CG::FLinearColor Red = { 1.f, 0.f, 0.f, 1.f };
+CG::FLinearColor Green = { 0.f, 1.f, 0.f, 1.f };
+CG::FLinearColor Blue = { 0.f, 0.f, 1.f, 1.f };
+
+void DrawBox(CG::UCanvas* canvas, CG::FVector2D TopLeft, CG::FVector2D DownRight, float Thickness, bool bIsVisible, CG::FLinearColor colVis, CG::FLinearColor colHidden)
+{
+	auto h = DownRight.Y - TopLeft.Y;
+	auto w = DownRight.X - TopLeft.X;
+
+	auto DownLeft = CG::FVector2D(TopLeft.X, DownRight.Y);
+	auto TopRight = CG::FVector2D(DownRight.X, TopLeft.Y);
+
+	canvas->K2_DrawLine(TopLeft, { TopLeft.X, TopLeft.Y + h * 1 }, 1.f, ((bIsVisible) ? colVis : colHidden));
+	canvas->K2_DrawLine(TopLeft, { TopLeft.X + w * 1, TopLeft.Y }, 1.f, ((bIsVisible) ? colVis : colHidden));
+
+	canvas->K2_DrawLine(DownRight, { DownRight.X, DownRight.Y - h * 1 }, 1.f, ((bIsVisible) ? colVis : colHidden));
+	canvas->K2_DrawLine(DownRight, { DownRight.X - w * 1, DownRight.Y }, 1.f, ((bIsVisible) ? colVis : colHidden));
+
+	canvas->K2_DrawLine(DownLeft, { DownLeft.X, DownLeft.Y - h * 1 }, 1.f, ((bIsVisible) ? colVis : colHidden));
+	canvas->K2_DrawLine(DownLeft, { DownLeft.X + w * 1, DownLeft.Y }, 1.f, ((bIsVisible) ? colVis : colHidden));
+
+	canvas->K2_DrawLine(TopRight, { TopRight.X, TopRight.Y + h * 1 }, 1.f, ((bIsVisible) ? colVis : colHidden));
+	canvas->K2_DrawLine(TopRight, { TopRight.X - w * 1, TopRight.Y }, 1.f, ((bIsVisible) ? colVis : colHidden));
+}
+
 void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 {
+	if (!GameInstance || !LocalPlayer)
+	{
+		GameInstance = (*CG::UWorld::GWorld)->OwningGameInstance;
+		if (GameInstance)
+			LocalPlayer = GameInstance->LocalPlayers[0];
+	}
+
 	if (GlobalFont == nullptr)
 		oPostRender(viewportclient, canvas);
 
@@ -51,21 +86,35 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 			{
 				auto actor = actors[j];
 				
-				if (actor != nullptr && actor->IsA(CG::AOakCharacter::StaticClass()))
+				if (actor && actor->RootComponent && actor->IsA(CG::AOakCharacter::StaticClass()))
 				{					
 					if (((CG::AOakCharacter*)actor)->DeathType != CG::EDeathType::None)
 						continue;
 
-					auto GameInstance = (*CG::UWorld::GWorld)->OwningGameInstance;
-					auto LocalPlayer = GameInstance->LocalPlayers[0];
 					auto PlayerController = LocalPlayer->PlayerController;
 
 					auto pos = actor->RootComponent->RelativeLocation;
 
-					CG::FVector2D screen;
-					if (PlayerController->ProjectWorldLocationToScreen(pos, &screen, false, false))
+					CG::FVector Origin;
+					CG::FVector BoxExtent;
+					actor->GetActorBounds(true, &Origin, &BoxExtent);
+
+					CG::FVector Head = { Origin.X, Origin.Y, Origin.Z + (BoxExtent.Z) };
+					CG::FVector Feet = { Origin.X, Origin.Y, Origin.Z - (BoxExtent.Z) };
+
+					CG::FVector2D HeadPos, FeetPos;
+					if (PlayerController->ProjectWorldLocationToScreen(Head, &HeadPos, false, false) && PlayerController->ProjectWorldLocationToScreen(Feet, &FeetPos, false, false))
 					{
-						canvas->K2_DrawText(GlobalFont, converter.from_bytes(actor->GetName()).c_str(), screen, White, false, Black, {0.f, 0.f}, false, false, true, Black);
+						bool bIsVisible = PlayerController->LineOfSightTo(actor, { 0.f, 0.f, 0.f }, false);
+
+						const float Height = abs(FeetPos.Y - HeadPos.Y);
+						const float Width = Height * 0.6f;
+
+						CG::FVector2D TopLeft = { HeadPos.X - Width * 0.5f, HeadPos.Y };
+						CG::FVector2D DownRight = { HeadPos.X + Width * 0.5f, FeetPos.Y };
+
+						DrawBox(canvas, TopLeft, DownRight, 1.f, bIsVisible, Cyan, Red);
+						canvas->K2_DrawText(GlobalFont, converter.from_bytes(actor->GetName()).c_str(), { TopLeft.X, TopLeft.Y - 15.f }, White, false, Black, { 0.f, 0.f }, false, false, true, Black);
 					}
 				}
 			}
@@ -109,19 +158,27 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 	}
 	else
 	{
-		auto GameInstance = (*CG::UWorld::GWorld)->OwningGameInstance;
-		auto LocalPlayer = GameInstance->LocalPlayers[0];
-		auto ViewportClient = LocalPlayer->ViewportClient;
-		void** VFTable = ViewportClient->VfTable;
+		while (!(*CG::UWorld::GWorld))
+			continue;
 
-		GlobalFont = CG::UObject::FindObject<CG::UFont>("Font Roboto.Roboto");
+		GameInstance = (*CG::UWorld::GWorld)->OwningGameInstance;
+		if (GameInstance)
+			LocalPlayer = GameInstance->LocalPlayers[0];
+		
+		if (LocalPlayer)
+		{
+			auto ViewportClient = LocalPlayer->ViewportClient;
+			void** VFTable = ViewportClient->VfTable;
 
-		VirtualProtect(&VFTable[post_render_index], 8, PAGE_EXECUTE_READWRITE, &oldProtect);
+			GlobalFont = CG::UObject::FindObject<CG::UFont>("Font Roboto.Roboto");
 
-		oPostRender = reinterpret_cast<decltype(oPostRender)>(VFTable[post_render_index]);
-		VFTable[post_render_index] = &PostRenderHook;
+			VirtualProtect(&VFTable[post_render_index], 8, PAGE_EXECUTE_READWRITE, &oldProtect);
 
-		VirtualProtect(&VFTable[post_render_index], 8, oldProtect, 0);
+			oPostRender = reinterpret_cast<decltype(oPostRender)>(VFTable[post_render_index]);
+			VFTable[post_render_index] = &PostRenderHook;
+
+			VirtualProtect(&VFTable[post_render_index], 8, oldProtect, 0);
+		}
 	}
 
 	std::cout << "BL3 SDK: Initalized\n";
@@ -155,42 +212,29 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 		if (GetAsyncKeyState(UnloadKey) & 0x1)
 			bShouldRun = false;
 
-		if (GetAsyncKeyState(VK_LSHIFT))
+		if (GetAsyncKeyState(VK_LSHIFT) && LocalPlayer)
 		{
 			if (!bSpeed)
 			{
-				auto GameInstance = (*CG::UWorld::GWorld)->OwningGameInstance;
-				auto LocalPlayer = GameInstance->LocalPlayers[0];
-
-				std::cout << "LocalPlayer Class: " << LocalPlayer->GetName() << std::endl;
-
 				auto PlayerController = LocalPlayer->PlayerController;
 				auto AcknowledgedPawn = PlayerController->AcknowledgedPawn;
-
-				std::cout << "AcknowledgedPawn Class: " << AcknowledgedPawn->GetName() << std::endl;
 
 				oldVal = AcknowledgedPawn->CustomTimeDilation;
 				AcknowledgedPawn->CustomTimeDilation = speedVal;
 
 				bSpeed = true;
-
-				std::cout << "ON\n";
 			}
 		}
 		else
 		{
 			if (bSpeed)
 			{
-				auto GameInstance = (*CG::UWorld::GWorld)->OwningGameInstance;
-				auto LocalPlayer = GameInstance->LocalPlayers[0];
 				auto PlayerController = LocalPlayer->PlayerController;
 				auto AcknowledgedPawn = PlayerController->AcknowledgedPawn;
 
 				AcknowledgedPawn->CustomTimeDilation = oldVal;
 
 				bSpeed = false;
-
-				std::cout << "OFF\n";
 			}
 		}
 
@@ -224,8 +268,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ulReasonForCall, LPVOID lpReserved)
 		if (con && con->IsAllocated())
 			con->Free();
 
-		auto GameInstance = (*CG::UWorld::GWorld)->OwningGameInstance;
-		auto LocalPlayer = GameInstance->LocalPlayers[0];
 		auto ViewportClient = LocalPlayer->ViewportClient;
 		void** VFTable = ViewportClient->VfTable;
 
