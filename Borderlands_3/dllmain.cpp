@@ -230,7 +230,7 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 			{
 				auto PlayerController = LocalPlayer->PlayerController;
 				auto AcknowledgedPawn = PlayerController->AcknowledgedPawn;
-
+				
 				if (AcknowledgedPawn)
 				{
 					AcknowledgedPawn->CustomTimeDilation = oldVal;
