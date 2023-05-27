@@ -179,6 +179,8 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="SDK.h" />
     <ClInclude Include="Utils\Console\Console.hpp" />
+    <ClInclude Include="Utils\Hooking\Hook.h" />
+    <ClInclude Include="Render.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />

@@ -22,6 +22,9 @@
     <Filter Include="Utils\Console">
       <UniqueIdentifier>{cf73f9de-d42a-4728-a93f-6b130cfe42e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\Hooking">
+      <UniqueIdentifier>{940f392d-f65e-4921-a435-ded905fc4e0f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -35,6 +38,12 @@
     </ClInclude>
     <ClInclude Include="Utils\Console\Console.hpp">
       <Filter>Utils\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Hooking\Hook.h">
+      <Filter>Utils\Hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
