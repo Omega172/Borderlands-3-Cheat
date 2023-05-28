@@ -13,6 +13,7 @@
 DWORD MenuKey = VK_INSERT;
 DWORD UnloadKey = VK_END;
 Console* con = nullptr;
+bool bShouldRun = true;
 std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
 // Globals
@@ -37,21 +38,40 @@ void RefreshGlobals()
 Hook<void(__thiscall*)(CG::UObject*, CG::UCanvas*)> PostRender;
 
 // Features
-float speedVal = 5.0f;
+bool lastLoop = false;
+float speedVal = 5.f;
+float smoothing = 5.f;
+bool bNoRecoil = false;
 float bDrawBones = false;
 
 void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 {
 	RefreshGlobals();
 
-	if (!(*CG::UWorld::GWorld) || !GlobalFont)
+	if (!(*CG::UWorld::GWorld) || !GlobalFont || !bShouldRun)
+	{
 		PostRender.oFunc(viewportclient, canvas);
+
+		if (!bShouldRun)
+		{
+			PostRender.RestoreHook();
+			lastLoop = true;
+		}
+	}
 
 	canvas->K2_DrawText(GlobalFont, L"OmegaWare.xyz", { 10.f, 10.f }, Colors::Cyan, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
 
 	std::wstring SpeedLabel = L"SpeedHack: ";
 	SpeedLabel += std::to_wstring(speedVal);
 	canvas->K2_DrawText(GlobalFont, SpeedLabel.c_str(), { 10.f, 25.f }, Colors::White, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
+
+	std::wstring SmoothingLabel = L"Smoothing: ";
+	SmoothingLabel += std::to_wstring(smoothing);
+	canvas->K2_DrawText(GlobalFont, SmoothingLabel.c_str(), { 10.f, 40.f }, Colors::White, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
+
+	std::wstring NoRecoilLabel = L"NoRecoil: ";
+	NoRecoilLabel += ((bNoRecoil) ? L"ON" : L"OFF");
+	canvas->K2_DrawText(GlobalFont, NoRecoilLabel.c_str(), { 10.f, 55.f }, Colors::White, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
 
 	auto PlayerController = LocalPlayer->PlayerController;
 
@@ -74,11 +94,14 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 		if (ptr != nullptr)
 		{
 			auto actors = ptr->NearActors;
+			if (!actors.Data() || !actors.Count())
+				PostRender.oFunc(viewportclient, canvas);
+
 			for (int j = 0; j < actors.Count(); j++)
 			{
 				auto actor = actors[j];
 
-				if (actor && actor->RootComponent && actor->IsA(CG::AOakCharacter::StaticClass()) && !(actor->GetName().find("BPChar_Siren") != std::string::npos))
+				if (actor && actor->RootComponent && actor->IsA(CG::ABPChar_Enemy_C::StaticClass()) && !(actor->GetName().find("BPChar_Siren") != std::string::npos))
 				{
 					// ESP
 					if (((CG::AOakCharacter*)actor)->DeathType != CG::EDeathType::None)
@@ -90,7 +113,7 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 					CG::FVector BoxExtent;
 					actor->GetActorBounds(true, &Origin, &BoxExtent);
 
-					CG::FVector HeadBone;	// 14 
+					CG::FVector HeadBone = ((CG::AOakCharacter*)actor)->Mesh->GetSocketLocation(((CG::AOakCharacter*)actor)->Mesh->GetBoneName(40));;	// 14 for most
 					CG::FVector TopBone = ((CG::AOakCharacter*)actor)->Mesh->GetSocketLocation(((CG::AOakCharacter*)actor)->Mesh->GetBoneName(8));	// 8 For most
 					for (int k = 0; k < ((CG::AOakCharacter*)actor)->Mesh->GetNumBones(); k++)
 					{
@@ -160,7 +183,10 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 
 	if (ClosestValidActorDistance != FLT_MAX && GetAsyncKeyState(VK_RBUTTON))
 	{
-		PlayerController->SetControlRotation(ClosestValidActor, true);
+		auto Delta = ClosestValidActor - CameraRotation;
+		auto SmoothedAngle = CameraRotation + Delta / smoothing;
+
+		PlayerController->SetControlRotation(SmoothedAngle, true);
 	}
 
 	//canvas->K2_DrawText(GlobalFont, L"Closest Valid Actor", { CVAScreen.X, CVAScreen.Y + 15 }, Colors::White, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
@@ -172,8 +198,6 @@ void SetupHooks();
 
 DWORD WINAPI MainThread(LPVOID lpParam)
 {
-	bool bShouldRun = true;
-
 	con = &Console::Instance(true);
 
 	if (CG::InitSdk())
@@ -250,13 +274,47 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 				speedVal = 1.f;
 		}
 
+		if (GetAsyncKeyState(VK_NUMPAD4) & 0x1)
+		{
+			smoothing += 1.0f;
+			if (smoothing > 10.f)
+				smoothing = 10.f;
+		}
+
+		if (GetAsyncKeyState(VK_NUMPAD5) & 0x1)
+		{
+			smoothing -= 1.0f;
+			if (smoothing < 1.f)
+				smoothing = 1.f;
+		}
+
 		if (GetAsyncKeyState(VK_ADD) & 0x1)
 			bDrawBones = !bDrawBones;
+
+		if ((GetAsyncKeyState(VK_SUBTRACT) & 0x1) && LocalPlayer)
+		{
+			bNoRecoil = !bNoRecoil;
+
+			auto PlayerController = LocalPlayer->PlayerController;
+
+			if (bNoRecoil)
+			{
+				PlayerController->CustomTimeDilation = -1.f;
+			}
+
+			if (!bNoRecoil)
+			{
+				PlayerController->CustomTimeDilation = 1;
+			}
+		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 
 	std::cout << "BL3 SDK: Unloading...\n";
+
+	while (!lastLoop)
+		continue;
 
 	std::this_thread::sleep_for(std::chrono::seconds(3));
 	FreeLibraryAndExitThread((HMODULE)lpParam, EXIT_SUCCESS);
@@ -283,8 +341,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ulReasonForCall, LPVOID lpReserved)
 	{
 		if (con && con->IsAllocated())
 			con->Free();
-
-		PostRender.RestoreHook();
 	}
 
 	return TRUE;

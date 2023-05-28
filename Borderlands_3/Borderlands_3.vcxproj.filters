@@ -71,5 +71,8 @@
     <ClCompile Include="SDK\OakGame_Package.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDK\BPChar_Enemy_Package.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
