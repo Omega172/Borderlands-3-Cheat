@@ -43,6 +43,7 @@ float speedVal = 5.f;
 float smoothing = 5.f;
 bool bNoRecoil = false;
 float bDrawBones = false;
+bool bGodMode = false;
 
 void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 {
@@ -72,6 +73,10 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 	std::wstring NoRecoilLabel = L"NoRecoil: ";
 	NoRecoilLabel += ((bNoRecoil) ? L"ON" : L"OFF");
 	canvas->K2_DrawText(GlobalFont, NoRecoilLabel.c_str(), { 10.f, 55.f }, Colors::White, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
+
+	std::wstring GodModeLabel = L"GodMode: ";
+	GodModeLabel += ((bGodMode) ? L"ON" : L"OFF");
+	canvas->K2_DrawText(GlobalFont, GodModeLabel.c_str(), { 10.f, 70.f }, Colors::White, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
 
 	auto PlayerController = LocalPlayer->PlayerController;
 
@@ -261,6 +266,30 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 				}
 
 				bSpeed = false;
+			}
+		}
+
+		if ((GetAsyncKeyState(VK_MULTIPLY) & 0x1) && LocalPlayer)
+		{
+			bGodMode = !bGodMode;
+
+			auto PlayerController = LocalPlayer->PlayerController;
+			auto AcknowledgedPawn = PlayerController->AcknowledgedPawn;
+
+			if (bGodMode)
+			{
+				if (AcknowledgedPawn)
+				{
+					AcknowledgedPawn->bCanBeDamaged = false;
+				}
+			}
+
+			if (!bGodMode)
+			{
+				if (AcknowledgedPawn)
+				{
+					AcknowledgedPawn->bCanBeDamaged = true;
+				}
 			}
 		}
 
