@@ -305,25 +305,34 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 
 void SetupHooks();
 
+bool Init()
+{
+	// Logging Initalizing SDK
+	bool SDK = CG::InitSdk();
+	if (!SDK)
+		return false;
+
+	// Logging Initalizing Main Globals
+	bool Globals = SetupGlobals();
+	if (!Globals)
+		return false;
+
+	// Setup Hooks
+	// Neets conversion to minhook
+
+	// Logging Creating Hooks
+	SetupHooks(); // Get a return value from this
+
+	return true;
+}
+
 DWORD WINAPI MainThread(LPVOID lpParam)
 {
 	con = &Console::Instance(true);
+	if (con != nullptr)
+		std::cout << "Console Allocated\n"; // Replace with Logging Create Console
 
-	if (CG::InitSdk() && SetupGlobals())
-	{
-		std::cout << "GObjects: 0x" << std::hex << CG::UObject::GObjects << std::endl;
-		std::cout << "GNames: 0x" << std::hex << CG::FName::GNames << std::endl;
-		std::cout << "GWorld 0x" << std::hex << CG::UWorld::GWorld << std::endl;
-
-		std::cout << "Initalizing static classes\n";
-		CG::ABPChar_Enemy_C::StaticClass();
-		CG::ABPChar_Player_C::StaticClass();
-
-		std::cout << "Setting up hooks\n";
-		SetupHooks();
-
-		std::cout << "BL3 SDK: Initalized\n";
-	}
+	if (Init())
 	else
 	{
 		std::cout << "BL3 SDK: Failed to Initalize SDK\n";
