@@ -68,14 +68,23 @@
     <ClCompile Include="SDK\GbxLevelSequence_Package.cpp">
       <Filter>SDK</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\OakGame_Package.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SDK\BPChar_Enemy_Package.cpp">
       <Filter>SDK</Filter>
     </ClCompile>
     <ClCompile Include="SDK\BPChar_Player_Package.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\DamageSource_Bullet_Heavy_Package.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\DmgType_Corrosive_Impact_Package.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\GbxWeapon_Package.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\OakGame_Package.cpp">
+      <Filter>SDK</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

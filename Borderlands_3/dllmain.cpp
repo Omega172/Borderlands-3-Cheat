@@ -67,6 +67,8 @@ float smoothing = 1.f;
 bool bNoRecoil = true;
 float bDrawBones = false;
 bool bGodMode = false;
+bool bNoSpread = true;
+bool bInfiniteAmmo = true;
 
 void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 {
@@ -99,32 +101,78 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 	GodModeLabel += ((bGodMode) ? L"ON" : L"OFF");
 	canvas->K2_DrawText(GlobalFont, GodModeLabel.c_str(), { 10.f, 70.f }, Colors::White, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
 
-	PlayerController = LocalPlayer->PlayerController;
+	if (!PlayerController)
+		PlayerController = LocalPlayer->PlayerController;
+
+	if (!AcknowledgedPawn)
+		AcknowledgedPawn = PlayerController->AcknowledgedPawn;
+
+	if (!BL3Player)
+		BL3Player = (CG::ABPChar_Player_C*)AcknowledgedPawn;
+	
+	if (BL3Player && !OakPlayerController)
+	{
+		if (BL3Player->IsControlled())
+			OakPlayerController = BL3Player->OakPlayerController;
+	}
+
+	if (BL3Player && !OakCharacterMovement)
+		OakCharacterMovement = BL3Player->OakCharacterMovement;
+
+	CG::URecoilControlComponent* RecoilControlComponent = nullptr;
+
+	if (OakPlayerController)
+	{
+		RecoilControlComponent = OakPlayerController->RecoilControlComponent;
+
+		if (RecoilControlComponent && bNoRecoil)
+		{
+			RecoilControlComponent->TargetRotation = { 0.f, 0.f, 0.f };
+		}
+	}
+
+	if (BL3Player)
+	{
+		CG::AWeapon* CurrentWeapon = BL3Player->GetActiveWeapon(NULL);
+
+		if (CurrentWeapon)
+		{
+			CG::UWeaponFireComponent* CurrentFireComponent = CurrentWeapon->CurrentFireComponent;
+
+			if (CurrentFireComponent)
+			{
+				//std::cout << "FireRate: " << CurrentFireComponent->FireRate.Value << std::endl;
+				//CurrentFireComponent->FireRate.Value = 100;
+				//CurrentFireComponent->DamageRadius.Value = FLT_MAX;
+				//CurrentFireComponent->DamageType = CG::UDmgType_Corrosive_Impact_C::StaticClass();
+				//CurrentFireComponent->DamageSource = CG::UDamageSource_Bullet_Heavy_C::StaticClass();
+
+				if (bNoSpread)
+				{
+					CurrentFireComponent->Spread.Value = NULL;
+					CurrentFireComponent->Spread.BaseValue = NULL;
+
+					CurrentFireComponent->AccuracyImpulse.Value = NULL;
+					CurrentFireComponent->AccuracyImpulse.BaseValue = NULL;
+
+					CurrentFireComponent->BurstAccuracyImpulseScale.Value = NULL;
+					CurrentFireComponent->BurstAccuracyImpulseScale.BaseValue = NULL;
+
+					CurrentFireComponent->ViewModelShotOffsetScale = 0;
+				}
+
+				if (bInfiniteAmmo)
+				{
+					CurrentFireComponent->ShotAmmoCost.Value = 0;
+					CurrentFireComponent->MinShotAmmoCost = 0;
+				}
+			}
+
+		}
+	}
+
 	if (!PlayerController)
 		return PostRender.oFunc(viewportclient, canvas);
-
-	AcknowledgedPawn = PlayerController->AcknowledgedPawn;
-	if (!AcknowledgedPawn)
-		return PostRender.oFunc(viewportclient, canvas);
-
-	BL3Player = (CG::ABPChar_Player_C*)AcknowledgedPawn;
-	if (!BL3Player)
-		return PostRender.oFunc(viewportclient, canvas);
-
-	OakPlayerController = BL3Player->OakPlayerController;
-	if (!OakPlayerController)
-		return PostRender.oFunc(viewportclient, canvas);
-
-	OakCharacterMovement = BL3Player->OakCharacterMovement;
-	if (!OakCharacterMovement)
-		return PostRender.oFunc(viewportclient, canvas);
-
-	CG::URecoilControlComponent* RecoilControlComponent = OakPlayerController->RecoilControlComponent;
-
-	if (RecoilControlComponent && bNoRecoil)
-	{
-		RecoilControlComponent->TargetRotation = { 0.f, 0.f, 0.f };
-	}
 
 	auto PlayerCameraManager = PlayerController->PlayerCameraManager;
 	if (!PlayerCameraManager)
@@ -135,6 +183,7 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 
 	float ClosestValidActorDistance = FLT_MAX;
 
+	CG::AActor* CVA = nullptr;
 	CG::FRotator ClosestValidActor;
 	CG::FVector2D CVAScreen;
 	bool bIsVisible = false;
@@ -225,6 +274,8 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 
 						ClosestValidActor = Res;
 						CVAScreen = head;
+
+						CVA = actor;
 					}
 				}
 			}
@@ -233,12 +284,17 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 
 	if (GetAsyncKeyState(VK_RBUTTON))
 	{
-		if (ClosestValidActorDistance != FLT_MAX)
+		if (ClosestValidActorDistance != FLT_MAX && RecoilControlComponent)
 		{
+			auto pos = AcknowledgedPawn->K2_GetActorLocation();
+			AcknowledgedPawn->K2_SetActorLocation(CVA->K2_GetActorLocation(), false, nullptr, true);
+
 			auto Delta = ClosestValidActor - CameraRotation;
 			auto SmoothedAngle = CameraRotation + Delta / smoothing;
 
 			PlayerController->SetControlRotation(SmoothedAngle - RecoilControlComponent->TargetRotation, true);
+
+			AcknowledgedPawn->K2_SetActorLocation(pos, false, nullptr, true);
 		}
 	}
 
@@ -359,21 +415,6 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 
 		if (GetAsyncKeyState(VK_SUBTRACT) & 0x1)
 			bNoRecoil = !bNoRecoil;
-
-		if (GetAsyncKeyState(VK_DELETE) & 0x1)
-		{
-			if (BL3Player)
-			{
-				CG::UOakCharacterMovementComponent* UCharacterMovementComponent = BL3Player->OakCharacterMovement;
-
-				if (UCharacterMovementComponent)
-				{
-					std::cout << std::to_string(static_cast<std::underlying_type_t<CG::EMovementMode>>(UCharacterMovementComponent->MovementMode)) << std::endl;
-
-					std::cout << ((UCharacterMovementComponent->IsWalking()) ? "Walking" : "Not Walking") << std::endl;;
-				}
-			}
-		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
