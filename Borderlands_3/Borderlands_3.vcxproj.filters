@@ -74,5 +74,8 @@
     <ClCompile Include="SDK\BPChar_Enemy_Package.cpp">
       <Filter>SDK</Filter>
     </ClCompile>
+    <ClCompile Include="SDK\BPChar_Player_Package.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

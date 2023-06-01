@@ -192,6 +192,7 @@
     </ClCompile>
     <ClCompile Include="SDK\BasicTypes_Package.cpp" />
     <ClCompile Include="SDK\BPChar_Enemy_Package.cpp" />
+    <ClCompile Include="SDK\BPChar_Player_Package.cpp" />
     <ClCompile Include="SDK\CoreUObject_Package.cpp" />
     <ClCompile Include="SDK\Engine_Package.cpp" />
     <ClCompile Include="SDK\GbxLevelSequence_Package.cpp" />

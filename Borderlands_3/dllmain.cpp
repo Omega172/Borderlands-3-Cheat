@@ -7,49 +7,70 @@
 #include <thread>
 #include <locale>
 #include <codecvt>
+#include <utility>
 
 // - C++ Exceptions are /EHa (Yes with SEH Exceptions)
 
 DWORD MenuKey = VK_INSERT;
 DWORD UnloadKey = VK_END;
 Console* con = nullptr;
+
 bool bShouldRun = true;
+bool lastLoop = false;
+
 std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
 // Globals
 CG::UGameInstance* GameInstance = nullptr;
 CG::ULocalPlayer* LocalPlayer = nullptr;
+CG::APlayerController* PlayerController = nullptr;
+CG::APawn* AcknowledgedPawn = nullptr;
+CG::ABPChar_Player_C* BL3Player = nullptr;
+CG::AOakPlayerController* OakPlayerController = nullptr;
+CG::UOakCharacterMovementComponent* OakCharacterMovement = nullptr;
+
 CG::UFont* GlobalFont = nullptr;
+CG::UKismetMathLibrary* MathLibrary = nullptr;
 
-void RefreshGlobals()
+bool SetupGlobals()
 {
+	std::cout << "Setting up cheat globals\n";
 
-	if ((*CG::UWorld::GWorld) && !GameInstance)
-		GameInstance = (*CG::UWorld::GWorld)->OwningGameInstance;
+	while (!(*CG::UWorld::GWorld))
+		continue;
 
-	if (GameInstance->LocalPlayers.Count())
-		LocalPlayer = GameInstance->LocalPlayers[0];
+	GameInstance = (*CG::UWorld::GWorld)->OwningGameInstance;
+	if (!GameInstance || !GameInstance->LocalPlayers.Count())
+		return false;
 
+	LocalPlayer = GameInstance->LocalPlayers[0];
+	if (!LocalPlayer)
+		return false;
+
+	GlobalFont = CG::UObject::FindObject<CG::UFont>("Font Roboto.Roboto");
 	if (!GlobalFont)
-		GlobalFont = CG::UObject::FindObject<CG::UFont>("Font Roboto.Roboto");
+		return false;
+
+	MathLibrary = (CG::UKismetMathLibrary*)CG::UKismetMathLibrary::StaticClass();
+	if (!MathLibrary)
+		return false;
+
+	return true;
 }
 
 // Hooks
 Hook<void(__thiscall*)(CG::UObject*, CG::UCanvas*)> PostRender;
 
 // Features
-bool lastLoop = false;
 float speedVal = 5.f;
-float smoothing = 5.f;
-bool bNoRecoil = false;
+float smoothing = 1.f;
+bool bNoRecoil = true;
 float bDrawBones = false;
 bool bGodMode = false;
 
 void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 {
-	RefreshGlobals();
-
-	if (!(*CG::UWorld::GWorld) || !GlobalFont || !bShouldRun)
+	if (!GlobalFont || !bShouldRun)
 	{
 		PostRender.oFunc(viewportclient, canvas);
 
@@ -78,10 +99,34 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 	GodModeLabel += ((bGodMode) ? L"ON" : L"OFF");
 	canvas->K2_DrawText(GlobalFont, GodModeLabel.c_str(), { 10.f, 70.f }, Colors::White, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
 
-	auto PlayerController = LocalPlayer->PlayerController;
+	PlayerController = LocalPlayer->PlayerController;
+	if (!PlayerController)
+		return PostRender.oFunc(viewportclient, canvas);
+
+	AcknowledgedPawn = PlayerController->AcknowledgedPawn;
+	if (!AcknowledgedPawn)
+		return PostRender.oFunc(viewportclient, canvas);
+
+	BL3Player = (CG::ABPChar_Player_C*)AcknowledgedPawn;
+	if (!BL3Player)
+		return PostRender.oFunc(viewportclient, canvas);
+
+	OakPlayerController = BL3Player->OakPlayerController;
+	if (!OakPlayerController)
+		return PostRender.oFunc(viewportclient, canvas);
+
+	OakCharacterMovement = BL3Player->OakCharacterMovement;
+	if (!OakCharacterMovement)
+		return PostRender.oFunc(viewportclient, canvas);
+
+	CG::URecoilControlComponent* RecoilControlComponent = OakPlayerController->RecoilControlComponent;
+
+	if (RecoilControlComponent && bNoRecoil)
+	{
+		RecoilControlComponent->TargetRotation = { 0.f, 0.f, 0.f };
+	}
 
 	auto PlayerCameraManager = PlayerController->PlayerCameraManager;
-
 	if (!PlayerCameraManager)
 		PostRender.oFunc(viewportclient, canvas);
 
@@ -92,6 +137,7 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 
 	CG::FRotator ClosestValidActor;
 	CG::FVector2D CVAScreen;
+	bool bIsVisible = false;
 
 	for (int i = 0; i < (**CG::UWorld::GWorld).Levels.Count(); i++)
 	{
@@ -146,7 +192,7 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 						}
 					}
 
-					bool bIsVisible = PlayerController->LineOfSightTo(actor, { 0.f, 0.f, 0.f }, false);
+					bIsVisible = PlayerController->LineOfSightTo(actor, { 0.f, 0.f, 0.f }, false);
 
 					CG::FVector2D HeadPos, FeetPos, head;
 					if (PlayerController->ProjectWorldLocationToScreen(Head, &HeadPos, false, false) && PlayerController->ProjectWorldLocationToScreen(Feet, &FeetPos, false, false) && PlayerController->ProjectWorldLocationToScreen(HeadBone, &head, false, false))
@@ -166,7 +212,6 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 
 					}	
 
-					auto MathLibrary = (CG::UKismetMathLibrary*)CG::UKismetMathLibrary::StaticClass();
 					CG::FRotator Res = MathLibrary->STATIC_FindLookAtRotation(CameraLocation, HeadBone);
 
 					float DiffY = Res.Pitch - CameraRotation.Pitch;
@@ -186,12 +231,15 @@ void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
 		}
 	}
 
-	if (ClosestValidActorDistance != FLT_MAX && GetAsyncKeyState(VK_RBUTTON))
+	if (GetAsyncKeyState(VK_RBUTTON))
 	{
-		auto Delta = ClosestValidActor - CameraRotation;
-		auto SmoothedAngle = CameraRotation + Delta / smoothing;
+		if (ClosestValidActorDistance != FLT_MAX)
+		{
+			auto Delta = ClosestValidActor - CameraRotation;
+			auto SmoothedAngle = CameraRotation + Delta / smoothing;
 
-		PlayerController->SetControlRotation(SmoothedAngle, true);
+			PlayerController->SetControlRotation(SmoothedAngle - RecoilControlComponent->TargetRotation, true);
+		}
 	}
 
 	//canvas->K2_DrawText(GlobalFont, L"Closest Valid Actor", { CVAScreen.X, CVAScreen.Y + 15 }, Colors::White, false, Colors::Black, { 0.f, 0.f }, false, false, true, Colors::Black);
@@ -205,16 +253,17 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 {
 	con = &Console::Instance(true);
 
-	if (CG::InitSdk())
+	if (CG::InitSdk() && SetupGlobals())
 	{
 		std::cout << "GObjects: 0x" << std::hex << CG::UObject::GObjects << std::endl;
 		std::cout << "GNames: 0x" << std::hex << CG::FName::GNames << std::endl;
 		std::cout << "GWorld 0x" << std::hex << CG::UWorld::GWorld << std::endl;
 
-		while (!(*CG::UWorld::GWorld))
-			continue;
+		std::cout << "Initalizing static classes\n";
+		CG::ABPChar_Enemy_C::StaticClass();
+		CG::ABPChar_Player_C::StaticClass();
 
-		RefreshGlobals();
+		std::cout << "Setting up hooks\n";
 		SetupHooks();
 
 		std::cout << "BL3 SDK: Initalized\n";
@@ -223,6 +272,7 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 	{
 		std::cout << "BL3 SDK: Failed to Initalize SDK\n";
 		bShouldRun = false;
+		lastLoop = true;
 	}
 
 	bool bSpeed = false;
@@ -237,64 +287,51 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 		if (GetAsyncKeyState(UnloadKey) & 0x1)
 			bShouldRun = false;
 
-		if (GetAsyncKeyState(VK_LSHIFT) && LocalPlayer)
+		if (OakCharacterMovement)
 		{
-			if (!bSpeed)
+			if (OakCharacterMovement->bIsSprinting)
 			{
-				auto PlayerController = LocalPlayer->PlayerController;
-				auto AcknowledgedPawn = PlayerController->AcknowledgedPawn;
-
-				if (AcknowledgedPawn)
+				if (!bSpeed)
 				{
-					oldVal = AcknowledgedPawn->CustomTimeDilation;
-					AcknowledgedPawn->CustomTimeDilation = speedVal;
-				}
+					oldVal = OakCharacterMovement->MaxSprintSpeed.Value;
 
-				bSpeed = true;
+					OakCharacterMovement->MaxSprintSpeed.Value = oldVal * speedVal;
+
+					bSpeed = true;
+				}
 			}
-		}
-		else
-		{
-			if (bSpeed)
+			else
 			{
-				auto PlayerController = LocalPlayer->PlayerController;
-				auto AcknowledgedPawn = PlayerController->AcknowledgedPawn;
-				
-				if (AcknowledgedPawn)
+				if (bSpeed)
 				{
-					AcknowledgedPawn->CustomTimeDilation = oldVal;
+					OakCharacterMovement->MaxSprintSpeed.Value = oldVal;
+					OakCharacterMovement->BrakingDecelerationWalkingBoostWhenExceedingMaxSpeed = 2000.f;
+
+					bSpeed = false;
 				}
 
-				bSpeed = false;
 			}
 		}
 
-		if ((GetAsyncKeyState(VK_MULTIPLY) & 0x1) && LocalPlayer)
+		if (GetAsyncKeyState(VK_MULTIPLY) & 0x1)
 		{
 			bGodMode = !bGodMode;
+		}
 
-			auto PlayerController = LocalPlayer->PlayerController;
-			auto AcknowledgedPawn = PlayerController->AcknowledgedPawn;
+		if (bGodMode && AcknowledgedPawn)
+		{
+			AcknowledgedPawn->bCanBeDamaged = false;
+		}
 
-			if (bGodMode)
-			{
-				if (AcknowledgedPawn)
-				{
-					AcknowledgedPawn->bCanBeDamaged = false;
-				}
-			}
-
-			if (!bGodMode)
-			{
-				if (AcknowledgedPawn)
-				{
-					AcknowledgedPawn->bCanBeDamaged = true;
-				}
-			}
+		if (!bGodMode && AcknowledgedPawn)
+		{
+			AcknowledgedPawn->bCanBeDamaged = true;
 		}
 
 		if (GetAsyncKeyState(VK_NUMPAD1) & 0x1)
+		{
 			speedVal += 1.0f;
+		}
 
 		if (GetAsyncKeyState(VK_NUMPAD2) & 0x1)
 		{
@@ -320,20 +357,21 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 		if (GetAsyncKeyState(VK_ADD) & 0x1)
 			bDrawBones = !bDrawBones;
 
-		if ((GetAsyncKeyState(VK_SUBTRACT) & 0x1) && LocalPlayer)
-		{
+		if (GetAsyncKeyState(VK_SUBTRACT) & 0x1)
 			bNoRecoil = !bNoRecoil;
 
-			auto PlayerController = LocalPlayer->PlayerController;
-
-			if (bNoRecoil)
+		if (GetAsyncKeyState(VK_DELETE) & 0x1)
+		{
+			if (BL3Player)
 			{
-				PlayerController->CustomTimeDilation = -1.f;
-			}
+				CG::UOakCharacterMovementComponent* UCharacterMovementComponent = BL3Player->OakCharacterMovement;
 
-			if (!bNoRecoil)
-			{
-				PlayerController->CustomTimeDilation = 1;
+				if (UCharacterMovementComponent)
+				{
+					std::cout << std::to_string(static_cast<std::underlying_type_t<CG::EMovementMode>>(UCharacterMovementComponent->MovementMode)) << std::endl;
+
+					std::cout << ((UCharacterMovementComponent->IsWalking()) ? "Walking" : "Not Walking") << std::endl;;
+				}
 			}
 		}
 
