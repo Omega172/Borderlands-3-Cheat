@@ -110,26 +110,8 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 			weaponStuff.get()->Run(weaponStuffArgs, 2);
 		}
 
-		// Get rid of all this shit key handleing should be done with the Feature classes or in ImGUI
 		if (GetAsyncKeyState(UnloadKey) & 0x1)
 			bShouldRun = false;
-
-		if (GetAsyncKeyState(VK_NUMPAD4) & 0x1)
-		{
-			//smoothing += 1.0f;
-			//if (smoothing > 10.f)
-				//smoothing = 10.f;
-		}
-
-		if (GetAsyncKeyState(VK_NUMPAD5) & 0x1)
-		{
-			//smoothing -= 1.0f;
-			//if (smoothing < 1.f)
-				//smoothing = 1.f;
-		}
-
-		//if (GetAsyncKeyState(VK_ADD) & 0x1)
-			//bDrawBones = !bDrawBones;
 
 		if (GetAsyncKeyState(MenuKey) & 0x1)
 			GUI::bMenuOpen = !GUI::bMenuOpen;
