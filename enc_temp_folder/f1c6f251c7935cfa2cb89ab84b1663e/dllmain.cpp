@@ -320,7 +320,6 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 			godMode.get()->Run(godModeArgs, 1);
 		}
 
-		weaponStuff.get()->HandleKeys();
 		if (BL3Player && RecoilControlComponent)
 		{
 			void* weaponStuffArgs[2] = { RecoilControlComponent, BL3Player->GetActiveWeapon(NULL) };

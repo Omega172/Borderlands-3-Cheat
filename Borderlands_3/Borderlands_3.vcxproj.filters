@@ -25,6 +25,18 @@
     <Filter Include="Utils\Hooking">
       <UniqueIdentifier>{940f392d-f65e-4921-a435-ded905fc4e0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features">
+      <UniqueIdentifier>{ce575ebf-0925-476a-ae10-ecb27149c998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\SpeedHack">
+      <UniqueIdentifier>{706969ac-99d0-4291-895e-15e9330cadf7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\GodMode">
+      <UniqueIdentifier>{19f51310-425a-4966-b0d0-344a04cc9e1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\WeaponStuff">
+      <UniqueIdentifier>{abe10f9b-f7f3-474f-b57f-7c6592c2b3ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -44,6 +56,18 @@
     </ClInclude>
     <ClInclude Include="Render.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Feature.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\SpeedHack.h">
+      <Filter>Features\SpeedHack</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\GodMode.h">
+      <Filter>Features\GodMode</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\WeaponStuff.h">
+      <Filter>Features\WeaponStuff</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +109,15 @@
     </ClCompile>
     <ClCompile Include="SDK\OakGame_Package.cpp">
       <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\SpeedHack.cpp">
+      <Filter>Features\SpeedHack</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\GodMode.cpp">
+      <Filter>Features\GodMode</Filter>
+    </ClCompile>
+    <ClCompile Include="Features\WeaponStuff.cpp">
+      <Filter>Features\WeaponStuff</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
