@@ -125,8 +125,6 @@ void GUI::Render()
 	CG::FVector CameraLocation = { 0.f, 0.f, 0.f };
 	CG::FRotator CameraRotation = { 0.f, 0.f, 0.f };
 
-
-	// Neto to fix crash here when loading from main menu
 	if (pUnreal->PlayerCameraManager && pUnreal->PlayerCameraManager->VfTable)
 	{
 		CameraLocation = pUnreal->PlayerCameraManager->GetCameraLocation();

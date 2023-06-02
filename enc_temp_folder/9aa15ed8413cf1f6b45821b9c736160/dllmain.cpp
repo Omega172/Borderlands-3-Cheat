@@ -20,6 +20,8 @@
 DWORD MenuKey = VK_INSERT;
 DWORD UnloadKey = VK_END;
 
+// Replace this and SetupGlobals() with a inline std::unique_ptr<CLASS_TYPE> to specalized global classes UnrealEngine and Borderlands3
+
 // Globals
 inline std::unique_ptr<Unreal> unreal = std::make_unique<Unreal>();
 
@@ -27,6 +29,35 @@ inline std::unique_ptr<Unreal> unreal = std::make_unique<Unreal>();
 inline std::unique_ptr<SpeedHack> speedHack = std::make_unique<SpeedHack>();
 inline std::unique_ptr<GodMode> godMode = std::make_unique<GodMode>();
 inline std::unique_ptr<WeaponStuff> weaponStuff = std::make_unique<WeaponStuff>();
+
+// Replace with with dx11 hook because ImGui for the win
+//void PostRenderHook(CG::UObject* viewportclient, CG::UCanvas* canvas)
+//{
+//	auto PlayerCameraManager = PlayerController->PlayerCameraManager;
+//	if (!PlayerCameraManager)
+//		PostRender.oFunc(viewportclient, canvas);
+//
+//	auto CameraLocation = PlayerCameraManager->GetCameraLocation();
+//	auto CameraRotation = PlayerCameraManager->GetCameraRotation();
+//
+//	float ClosestValidActorDistance = FLT_MAX;
+//
+//	CG::AActor* CVA = nullptr;
+//	CG::FRotator ClosestValidActor;
+//	CG::FVector2D CVAScreen;
+//	bool bIsVisible = false;
+//
+//	if (GetAsyncKeyState(VK_RBUTTON))
+//	{
+//		if (ClosestValidActorDistance != FLT_MAX && RecoilControlComponent)
+//		{
+//			auto Delta = ClosestValidActor - CameraRotation;
+//			auto SmoothedAngle = CameraRotation + Delta / smoothing;
+//
+//			PlayerController->SetControlRotation(SmoothedAngle - RecoilControlComponent->TargetRotation, true);
+//		}
+//	}
+//}
 
 bool Init()
 {

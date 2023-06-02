@@ -15,6 +15,7 @@ public:
 	CG::AOakPlayerController* OakPlayerController = nullptr;
 	CG::UOakCharacterMovementComponent* OakCharacterMovement = nullptr;
 	CG::URecoilControlComponent* RecoilControlComponent = nullptr;
+	CG::APlayerCameraManager* PlayerCameraManager = nullptr;
 
 	void Refresh()
 	{
@@ -35,5 +36,8 @@ public:
 
 		if (OakPlayerController)
 			RecoilControlComponent = OakPlayerController->RecoilControlComponent;
+
+		if (PlayerController && !PlayerCameraManager)
+			PlayerCameraManager = PlayerController->PlayerCameraManager;
 	}
 };

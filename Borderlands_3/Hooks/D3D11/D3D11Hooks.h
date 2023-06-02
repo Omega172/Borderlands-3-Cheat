@@ -36,10 +36,10 @@ void InitImGui()
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (GUI::bMenuOpen && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-		return true;
+	if (GUI::bMenuOpen)
+		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+	return (GUI::bMenuOpen) ? GUI::bMenuOpen : CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
