@@ -60,10 +60,14 @@ public:
 		ImGui::Checkbox("No Spread", &bNoSpread);
 
 		ImGui::Checkbox("Infinite Ammo", &bInfiniteAmmo);
-
+		ImGui::SameLine();
 		ImGui::Checkbox("Mod Firerate", &bFireRate);
+
 		if (bFireRate)
-			ImGui::SliderFloat("Firerate Modifier", &fFireRate, 1.f, 10.f);
+		{
+			ImGui::Text("Firerate Modifier");
+			ImGui::SliderFloat("##Firerate Modifier", &fFireRate, 1.f, 10.f);
+		}
 	}
 
 	// This should be run at the top of the ImGUI draw loop, used to render things like ESP, Tracers, and Debug Info

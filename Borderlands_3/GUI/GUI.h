@@ -4,8 +4,8 @@
 namespace GUI
 {
 	inline bool bMenuOpen = true;
-	inline int WIDTH = 600;
-	inline int HEIGHT = 300;
+	inline int WIDTH = 700;
+	inline int HEIGHT = 400;
 
 	inline void BeginRender()
 	{

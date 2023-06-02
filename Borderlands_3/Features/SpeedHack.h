@@ -39,8 +39,11 @@ public:
 	{
 		ImGui::Checkbox("SpeedHack", &bEnabled);
 
-		if(bEnabled)
-			ImGui::SliderFloat("Speed Multiplier", &fSpeed, 1.0f, 20.f);
+		if (bEnabled)
+		{
+			ImGui::Text("Speed Multiplier");
+			ImGui::SliderFloat("##Speed Multiplier", &fSpeed, 1.0f, 20.f);
+		}
 	}
 
 	// This should be run at the top of the ImGUI draw loop, used to render things like ESP, Tracers, and Debug Info
