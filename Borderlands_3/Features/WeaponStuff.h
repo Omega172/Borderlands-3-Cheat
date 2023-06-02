@@ -7,11 +7,15 @@ private:
 	bool Initalized = false;
 	bool bNoSpreadSwitch = false;
 	bool bInfiniteAmmoSwitch = false;
+	bool bFireRateSwitch = false;
+
+	float fFireRate = 1;
 
 public:
 	bool bNoRecoil = true;
 	bool bNoSpread = true;
 	bool bInfiniteAmmo = true;
+	bool bFireRate = false;
 
 private:
 	CG::AWeapon* pOldWeapon = nullptr;
@@ -25,6 +29,8 @@ private:
 
 	int iOldShotAmmoCost = 0;
 	int iOldMinShotAmmoCost = 0;
+
+	float fOldFireRate = 0;
 
 public:
 	WeaponStuff() {};
@@ -44,14 +50,21 @@ public:
 	}
 
 	// Handle checking for any key/hotkey presses or holds needed for features
-	void HandleKeys() override
-	{
-		if (GetAsyncKeyState(VK_SUBTRACT) & 0x1)
-			bNoRecoil = !bNoRecoil;
-	}
+	void HandleKeys() override {}
 
 	// This should be run in the ImGUI draw loop, used to draw anything to the menu
-	void DrawMenuItems() override {}
+	void DrawMenuItems() override
+	{
+		ImGui::Checkbox("No Recoil", &bNoRecoil);
+		ImGui::SameLine();
+		ImGui::Checkbox("No Spread", &bNoSpread);
+
+		ImGui::Checkbox("Infinite Ammo", &bInfiniteAmmo);
+
+		ImGui::Checkbox("Mod Firerate", &bFireRate);
+		if (bFireRate)
+			ImGui::SliderFloat("Firerate Modifier", &fFireRate, 1.f, 10.f);
+	}
 
 	// This should be run at the top of the ImGUI draw loop, used to render things like ESP, Tracers, and Debug Info
 	void Render(void** args, size_t numArgs) override {}

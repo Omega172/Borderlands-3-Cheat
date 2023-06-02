@@ -27,7 +27,23 @@ void WeaponStuff::Run(void** args, size_t numArgs)
 
 		if (CurrentFireComponent)
 		{
-			//CurrentFireComponent->FireRate.Value = 100;
+			if (bFireRate)
+			{
+				if (!bFireRateSwitch || pOldWeapon != CurrentWeapon)
+				{
+					if (bFireRateSwitch && pOldWeapon != CurrentWeapon)
+						pOldWeapon->CurrentFireComponent->FireRate.Value = fOldFireRate;
+
+					fOldFireRate = CurrentFireComponent->FireRate.Value;
+				}
+
+				CurrentFireComponent->FireRate.Value = fOldFireRate * fFireRate;
+
+				bFireRateSwitch = true;
+			}
+			else if (!bFireRate)
+				bFireRateSwitch = false;
+
 			//CurrentFireComponent->DamageType = CG::UDmgType_Corrosive_Impact_C::StaticClass();
 			//CurrentFireComponent->DamageSource = CG::UDamageSource_Bullet_Heavy_C::StaticClass();
 

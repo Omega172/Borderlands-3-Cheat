@@ -146,6 +146,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)Borderlands_3\Kiero\minhook\include\minhook.x64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -172,6 +173,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)Borderlands_3\Kiero\minhook\include\minhook.x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -180,17 +182,40 @@
     <ClInclude Include="Features\SpeedHack.h" />
     <ClInclude Include="Features\WeaponStuff.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GUI\Custom.h" />
+    <ClInclude Include="GUI\GUI.h" />
+    <ClInclude Include="Unreal.h" />
+    <ClInclude Include="GUI\Watermark.h" />
+    <ClInclude Include="Hooks\D3D11\D3D11Hooks.h" />
+    <ClInclude Include="ImGUI\imconfig.h" />
+    <ClInclude Include="ImGUI\imgui.h" />
+    <ClInclude Include="ImGUI\imgui_impl_dx11.h" />
+    <ClInclude Include="ImGUI\imgui_impl_win32.h" />
+    <ClInclude Include="ImGUI\imgui_internal.h" />
+    <ClInclude Include="ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="ImGUI\imstb_textedit.h" />
+    <ClInclude Include="ImGUI\imstb_truetype.h" />
+    <ClInclude Include="Kiero\kiero.h" />
+    <ClInclude Include="Kiero\minhook\include\MinHook.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SDK.h" />
+    <ClInclude Include="ImGUI\Styles.h" />
     <ClInclude Include="Utils\Console\Console.hpp" />
-    <ClInclude Include="Utils\Hooking\Hook.h" />
-    <ClInclude Include="Render.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Features\GodMode.cpp" />
     <ClCompile Include="Features\SpeedHack.cpp" />
     <ClCompile Include="Features\WeaponStuff.cpp" />
+    <ClCompile Include="GUI\GUI.cpp" />
+    <ClCompile Include="ImGUI\imgui.cpp" />
+    <ClCompile Include="ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="ImGUI\imgui_impl_dx11.cpp" />
+    <ClCompile Include="ImGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="ImGUI\imgui_tables.cpp" />
+    <ClCompile Include="ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="Kiero\kiero.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -204,6 +229,7 @@
     <ClCompile Include="SDK\DamageSource_Bullet_Heavy_Package.cpp" />
     <ClCompile Include="SDK\DmgType_Corrosive_Impact_Package.cpp" />
     <ClCompile Include="SDK\Engine_Package.cpp" />
+    <ClCompile Include="SDK\GbxGameSystemCore_Package.cpp" />
     <ClCompile Include="SDK\GbxLevelSequence_Package.cpp" />
     <ClCompile Include="SDK\GbxWeapon_Package.cpp" />
     <ClCompile Include="SDK\OakGame_Package.cpp" />

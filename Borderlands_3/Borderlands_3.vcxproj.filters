@@ -37,6 +37,36 @@
     <Filter Include="Features\WeaponStuff">
       <UniqueIdentifier>{abe10f9b-f7f3-474f-b57f-7c6592c2b3ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Kiero">
+      <UniqueIdentifier>{8182169c-9e8f-48e5-b187-51137dc2e6c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kiero\MinHook">
+      <UniqueIdentifier>{9eeea8b6-8012-4a7b-8d69-76dcee508577}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kiero\MinHook\src">
+      <UniqueIdentifier>{5c88328b-cd14-49e2-9a58-819197414eb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kiero\MinHook\src\hde">
+      <UniqueIdentifier>{788b317c-c711-4d39-8040-2bd729f15d2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kiero\MinHook\include">
+      <UniqueIdentifier>{27c68dda-1e6b-4e01-8b35-fb703c062c64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGUI">
+      <UniqueIdentifier>{de890f37-7af7-4974-afb5-48c059899281}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks">
+      <UniqueIdentifier>{60a3de30-2f7a-4b6f-b6dc-9fa47f48a301}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks\D3D11">
+      <UniqueIdentifier>{ee62565c-aa1e-4f66-8cb4-d92a3bba5357}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{2d82ef40-8476-4668-a865-309d94eccb8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Watermark">
+      <UniqueIdentifier>{9b7e4438-62e2-4224-ae1d-68b6834dc6cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -45,17 +75,8 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK.h">
-      <Filter>SDK</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\Console\Console.hpp">
       <Filter>Utils\Console</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Hooking\Hook.h">
-      <Filter>Utils\Hooking</Filter>
-    </ClInclude>
-    <ClInclude Include="Render.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Features\Feature.h">
       <Filter>Features</Filter>
@@ -68,6 +89,57 @@
     </ClInclude>
     <ClInclude Include="Features\WeaponStuff.h">
       <Filter>Features\WeaponStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="Kiero\kiero.h">
+      <Filter>Kiero</Filter>
+    </ClInclude>
+    <ClInclude Include="Kiero\minhook\include\MinHook.h">
+      <Filter>Kiero\MinHook\include</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imconfig.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui_impl_dx11.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui_impl_win32.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui_internal.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imstb_rectpack.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imstb_textedit.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imstb_truetype.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\D3D11\D3D11Hooks.h">
+      <Filter>Hooks\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\Styles.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Custom.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\GUI.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Watermark.h">
+      <Filter>Features\Watermark</Filter>
+    </ClInclude>
+    <ClInclude Include="Unreal.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +190,36 @@
     </ClCompile>
     <ClCompile Include="Features\WeaponStuff.cpp">
       <Filter>Features\WeaponStuff</Filter>
+    </ClCompile>
+    <ClCompile Include="Kiero\kiero.cpp">
+      <Filter>Kiero</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_demo.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_draw.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_impl_dx11.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_impl_win32.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_tables.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_widgets.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\GUI.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\GbxGameSystemCore_Package.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -16,6 +16,17 @@
 #include <cstdint>
 #include <Windows.h>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "ImGUI/imgui.h"
+#include "ImGui/imgui_impl_win32.h"
+#include "ImGui/imgui_impl_dx11.h"
+#include "GUI/Custom.h"
+
+#include "Utils/Console/Console.hpp"
+
+inline bool bShouldRun = true;
+inline Console* con = nullptr;
+
 #include "SDK/BasicTypes_Package.h"
 #include "SDK/Bones_Package.h"
 #include "SDK/Global_Package.h"

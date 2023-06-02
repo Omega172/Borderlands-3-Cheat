@@ -3,7 +3,7 @@
 
 void SpeedHack::Run(void** args, size_t numArgs)
 {
-	if (!Initalized)
+	if (!Initalized || !bEnabled)
 		return;
 
 	if (numArgs != 1)
