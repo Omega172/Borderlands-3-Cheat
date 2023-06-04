@@ -3,7 +3,7 @@
 
 namespace GUI
 {
-	inline bool bMenuOpen = true;
+	inline bool bMenuOpen = false;
 	inline int WIDTH = 700;
 	inline int HEIGHT = 400;
 

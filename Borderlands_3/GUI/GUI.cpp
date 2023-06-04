@@ -28,6 +28,17 @@ bool bDrawBones = false;
 bool bAimbot = true;
 bool bAimVisibleOnly = true;
 float fSmoothing = 1.f;
+bool bHealthBar = true;
+bool bShieldBar = true;
+
+ImU32 Black = ImGui::ColorConvertFloat4ToU32({ 0.f, 0.f, 0.f, 1.f });
+ImU32 White = ImGui::ColorConvertFloat4ToU32({ 1.f, 1.f, 1.f, 1.f });
+
+ImU32 Red = ImGui::ColorConvertFloat4ToU32({ 1.f, 0.f, 0.f, 1.f });
+ImU32 Green = ImGui::ColorConvertFloat4ToU32({ 0.f, 1.f, 0.f, 1.f });
+ImU32 Blue = ImGui::ColorConvertFloat4ToU32({ 0.f, 0.f, 1.f, 1.f });
+
+ImU32 Cyan = ImGui::ColorConvertFloat4ToU32({ 0.f, 1.f, 1.f, 1.f });
 
 void GUI::Render()
 {
@@ -85,6 +96,11 @@ void GUI::Render()
 			ImGui::Checkbox("Names", &bNameESP);
 			ImGui::SameLine();
 			ImGui::Checkbox("Visible Only", &bESPVisibleOnly);
+
+			ImGui::Checkbox("Health Bar", &bHealthBar);
+			ImGui::Checkbox("Shield Bar", &bShieldBar);
+
+			ImGui::Spacing();
 
 			ImGui::Checkbox("Draw Bone IDs", &bDrawBones);
 		}
@@ -235,8 +251,9 @@ void GUI::Render()
 
 								if ((bESPVisibleOnly && bIsVisible) || !bESPVisibleOnly)
 								{
-									ImU32 Color = (bIsVisible) ? ImGui::ColorConvertFloat4ToU32({ 0.f, 1.f, 0.f, 1.f }) : ImGui::ColorConvertFloat4ToU32({ 1.f, 0.f, 0.f, 1.f });
+									ImU32 Color = (bIsVisible) ? Green : Red;
 
+									// Outline
 									ImGui::GetBackgroundDrawList()->AddLine({ TopLeft.X, TopLeft.Y }, { TopLeft.X, TopLeft.Y + h * 1 }, Color);
 									ImGui::GetBackgroundDrawList()->AddLine({ TopLeft.X, TopLeft.Y }, { TopLeft.X + w * 1, TopLeft.Y }, Color);
 
@@ -250,7 +267,39 @@ void GUI::Render()
 									ImGui::GetBackgroundDrawList()->AddLine({ TopRight.X, TopRight.Y }, { TopRight.X - w * 1, TopRight.Y }, Color);
 
 									if (bNameESP)
-										ImGui::GetBackgroundDrawList()->AddText({ TopLeft.X, TopLeft.Y - 15.f }, ImGui::ColorConvertFloat4ToU32({ 1.f, 1.f, 1.f, 1.f }), Target->GetName().c_str());
+										ImGui::GetBackgroundDrawList()->AddText({ TopLeft.X, TopLeft.Y - 15.f }, White, Target->GetName().c_str());
+
+									if (bHealthBar)
+									{
+										auto MaxHealth = Target->DamageComponent->GetMaxHealth();
+										auto CurrentHealth = Target->DamageComponent->GetCurrentHealth();
+										float Height = DownRight.Y - (TopRight.Y + 1);
+
+										float g = ((CurrentHealth / MaxHealth) * 255);
+										float r = 255 - g;
+
+										// Outline
+										ImGui::GetBackgroundDrawList()->AddRect({ DownRight.X + 10, DownRight.Y + 1 }, { TopRight.X + 5, TopRight.Y }, White);
+
+										// Health Bar
+										ImGui::GetBackgroundDrawList()->AddRectFilled({ DownRight.X + 9, DownRight.Y }, { DownRight.X + 6, DownRight.Y - (Height * (CurrentHealth / MaxHealth)) }, ImGui::ColorConvertFloat4ToU32({ r, g, 0.f, 1.f }));
+									}
+
+									if (bShieldBar)
+									{
+										auto MaxShield = Target->DamageComponent->GetMaxShield();
+										if (MaxShield)
+										{
+											auto CurrentShield = Target->DamageComponent->GetCurrentShield();
+											float Height = DownRight.Y - (TopRight.Y + 1);
+
+											// Outline
+											ImGui::GetBackgroundDrawList()->AddRect({ DownRight.X + 18, DownRight.Y + 1 }, { TopRight.X + 13, TopRight.Y }, White);
+
+											// Shield Bar
+											ImGui::GetBackgroundDrawList()->AddRectFilled({ DownRight.X + 17, DownRight.Y }, { DownRight.X + 14, DownRight.Y - (Height * (CurrentShield / MaxShield)) }, Blue);
+										}
+									}
 								}
 							}
 						}
