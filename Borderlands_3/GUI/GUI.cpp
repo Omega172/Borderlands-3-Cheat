@@ -187,19 +187,34 @@ void GUI::Render()
 					if (!bTeamESP && !Target->IsA(CG::ABPChar_Enemy_C::StaticClass()))
 						continue;
 
+					if (Target->IsA(CG::ABPChar_Enemy_C::StaticClass()))
+					{
+						auto AIBalanceState = ((CG::ABPChar_Enemy_C*)Target)->AIBalanceState;
+
+						if (AIBalanceState)
+						{
+							if (AIBalanceState->bIsAnointed)
+							{
+								//uint8_t a = static_cast<std::underlying_type_t<CG::EAnointedDeathState>>(AIBalanceState->AnointedDeathState);
+								//std::cout << std::dec << unsigned(a) << std::endl;
+
+								if (AIBalanceState->AnointedDeathState != CG::EAnointedDeathState::PreFreeze)
+									continue;
+							}
+						}
+						else
+							continue;
+					}
+
 					CG::FVector Origin;
 					CG::FVector BoxExtent;
 					Target->GetActorBounds(true, &Origin, &BoxExtent);
 
 					CG::FVector HeadBone = Target->Mesh->GetSocketLocation(Target->Mesh->GetBoneName(40));;	// 14 for most
-					CG::FVector TopBone = Target->Mesh->GetSocketLocation(Target->Mesh->GetBoneName(8));	// 8 For most
 					for (int k = 0; k < Target->Mesh->GetNumBones(); k++)
 					{
 						if (Target->Mesh->GetBoneName(k).GetName() == "Head")
 							HeadBone = Target->Mesh->GetSocketLocation(Target->Mesh->GetBoneName(k));
-
-						if (Target->Mesh->GetBoneName(k).GetName() == "Camera")
-							TopBone = Target->Mesh->GetSocketLocation(Target->Mesh->GetBoneName(k));
 					}
 
 					if (Target->IsA(CG::ABPChar_Enemy_C::StaticClass()))
@@ -218,7 +233,6 @@ void GUI::Render()
 								CVADist = Distance;
 
 								CVAAngle = Res;
-								//CVAScreen = head;
 
 								CVA = Target;
 							}
