@@ -17,6 +17,8 @@ public:
 	CG::URecoilControlComponent* RecoilControlComponent = nullptr;
 	CG::APlayerCameraManager* PlayerCameraManager = nullptr;
 
+	CG::AOakCharacter* TargetEnt = nullptr;
+
 	void Refresh()
 	{
 		if (LocalPlayer && (!PlayerController || PlayerController != LocalPlayer->PlayerController))

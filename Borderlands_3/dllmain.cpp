@@ -12,7 +12,8 @@
 #include <thread>
 #include <locale>
 #include <codecvt>
-#include <utility>
+#include <fstream>
+#include <shlobj.h>
 
 // - C++ Exceptions are /EHa (Yes with SEH Exceptions)
 
@@ -115,6 +116,42 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 
 		if (GetAsyncKeyState(MenuKey) & 0x1)
 			GUI::bMenuOpen = !GUI::bMenuOpen;
+
+		if (GetAsyncKeyState(VK_MBUTTON) & 0x1)
+		{
+			if (pUnreal->TargetEnt != nullptr)
+			{
+				auto Target = pUnreal->TargetEnt;
+				auto NumBones = Target->Mesh->GetNumBones();
+
+				CHAR DocumentsFolder[MAX_PATH];
+				HRESULT result = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, DocumentsFolder);
+
+				if (result == S_OK)
+				{
+					std::string Filename = DocumentsFolder;
+					Filename += "\\OmegaWare\\Borderlands 3\\";
+
+					Filename += Target->GetName();
+					Filename += ".txt";
+
+					std::ofstream OutputFile;
+					OutputFile.open(Filename);
+					OutputFile << "# of Bones: " << NumBones << std::endl << std::endl;
+
+					std::cout << "Attempting to dump bone info\n";
+
+					for (int k = 0; k < NumBones; k++)
+					{
+						std::string BoneName = Target->Mesh->GetBoneName(k).GetName();
+
+						OutputFile << k << ": " << BoneName << std::endl;
+					}
+
+					OutputFile.close();
+				}
+			}
+		}
 	}
 
 	// Restore hooked functions

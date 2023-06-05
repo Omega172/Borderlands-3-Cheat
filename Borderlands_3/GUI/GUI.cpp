@@ -31,6 +31,9 @@ float fSmoothing = 1.f;
 bool bHealthBar = true;
 bool bShieldBar = true;
 
+bool bAllDebug = false;
+bool bTargetDebug = false;
+
 ImU32 Black = ImGui::ColorConvertFloat4ToU32({ 0.f, 0.f, 0.f, 1.f });
 ImU32 White = ImGui::ColorConvertFloat4ToU32({ 1.f, 1.f, 1.f, 1.f });
 
@@ -65,6 +68,11 @@ void GUI::Render()
 			ImGui::Checkbox("Watermark", &bWatermark);
 			if (bWatermark)
 				ImGui::Checkbox("Watermark FPS", &bWatermarkFPS);
+
+			ImGui::Checkbox("Draw Debug Boxes", &bAllDebug);
+			ImGui::SameLine();
+			if (bAllDebug)
+				ImGui::Checkbox("Only Target", &bTargetDebug);
 		}
 		ImGui::EndChild();
 		ImGui::SameLine();
@@ -98,6 +106,7 @@ void GUI::Render()
 			ImGui::Checkbox("Visible Only", &bESPVisibleOnly);
 
 			ImGui::Checkbox("Health Bar", &bHealthBar);
+			ImGui::SameLine();
 			ImGui::Checkbox("Shield Bar", &bShieldBar);
 
 			ImGui::Spacing();
@@ -150,7 +159,7 @@ void GUI::Render()
 	}
 
 	auto CVADist = FLT_MAX;
-	CG::AOakCharacter* CVA;
+	CG::AOakCharacter* CVA = nullptr;
 	CG::FRotator CVAAngle;
 
 	for (int i = 0; i < (**CG::UWorld::GWorld).Levels.Count(); i++)
@@ -314,6 +323,106 @@ void GUI::Render()
 											ImGui::GetBackgroundDrawList()->AddRectFilled({ DownRight.X + 17, DownRight.Y }, { DownRight.X + 14, DownRight.Y - (Height * (CurrentShield / MaxShield)) }, Blue);
 										}
 									}
+
+									if (bAllDebug && !bTargetDebug)
+									{
+										ImGui::GetBackgroundDrawList()->AddLine({ TopRight.X, TopRight.Y }, { TopRight.X + 35, TopRight.Y - 35 }, White);
+
+										ImColor Col = { 0.f, 0.f, 0.f, .5f };
+
+										auto MaxHealth = Target->DamageComponent->GetMaxHealth();
+										auto CurrentHealth = Target->DamageComponent->GetCurrentHealth();
+										std::string HealthStats = "Health: " + std::to_string(CurrentHealth) + " / " + std::to_string(MaxHealth);
+										
+										auto MaxShield = Target->DamageComponent->GetMaxShield();
+										auto CurrentShield = Target->DamageComponent->GetCurrentShield();
+										std::string ShieldStats = "Shields: " + std::to_string(CurrentShield) + " / " + std::to_string(MaxShield);
+
+										auto Pos = Target->K2_GetActorLocation();
+										std::string PosString = "X: " + std::to_string(Pos.X) + " Y: " + std::to_string(Pos.Y) + " Z: " + std::to_string(Pos.Z);
+
+										ImVec2 Size = ImGui::CalcTextSize(Target->GetName().c_str());
+
+										if (ImGui::CalcTextSize(HealthStats.c_str()).x > Size.x)
+											Size = ImGui::CalcTextSize(HealthStats.c_str());
+
+										if (ImGui::CalcTextSize(ShieldStats.c_str()).x > Size.x)
+											Size = ImGui::CalcTextSize(ShieldStats.c_str());
+
+										if (ImGui::CalcTextSize(PosString.c_str()).x > Size.x)
+											Size = ImGui::CalcTextSize(PosString.c_str());
+
+										ImVec2 Begin = { TopRight.X + 35, TopRight.Y - 35 };
+										ImVec2 End = { Begin.x + Size.x, Begin.y + Size.y * 6 };
+
+										ImGui::GetBackgroundDrawList()->AddRect(Begin, { End.x + 2, End.y }, White);
+										ImGui::GetBackgroundDrawList()->AddRectFilled(Begin, { End.x + 2, End.y }, Col);
+										ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y }, White, Target->GetName().c_str());
+
+										ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y }, White, HealthStats.c_str());
+
+										if (MaxShield)
+											ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y * 2 }, White, ShieldStats.c_str());
+										else
+											ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y * 2 }, White, "Shields: No Shields");
+
+										ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y * 3}, White, PosString.c_str());
+
+										std::string NumBones = "# of Bones: " + std::to_string(Target->Mesh->GetNumBones());
+										ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y * 4 }, White, NumBones.c_str());
+
+										std::string IsTarget = "IsTarget: ";
+										IsTarget += (Target == pUnreal->TargetEnt) ? "True" : "False";
+										ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y * 5 }, White, IsTarget.c_str());
+									}
+
+									if (bAllDebug && bTargetDebug && pUnreal->TargetEnt && Target == pUnreal->TargetEnt)
+									{
+										ImGui::GetBackgroundDrawList()->AddLine({ TopRight.X, TopRight.Y }, { TopRight.X + 35, TopRight.Y - 35 }, White);
+
+										ImColor Col = { 0.f, 0.f, 0.f, .5f };
+
+										auto MaxHealth = Target->DamageComponent->GetMaxHealth();
+										auto CurrentHealth = Target->DamageComponent->GetCurrentHealth();
+										std::string HealthStats = "Health: " + std::to_string(CurrentHealth) + " / " + std::to_string(MaxHealth);
+
+										auto MaxShield = Target->DamageComponent->GetMaxShield();
+										auto CurrentShield = Target->DamageComponent->GetCurrentShield();
+										std::string ShieldStats = "Shields: " + std::to_string(CurrentShield) + " / " + std::to_string(MaxShield);
+
+										auto Pos = Target->K2_GetActorLocation();
+										std::string PosString = "X: " + std::to_string(Pos.X) + " Y: " + std::to_string(Pos.Y) + " Z: " + std::to_string(Pos.Z);
+
+										ImVec2 Size = ImGui::CalcTextSize(Target->GetName().c_str());
+
+										if (ImGui::CalcTextSize(HealthStats.c_str()).x > Size.x)
+											Size = ImGui::CalcTextSize(HealthStats.c_str());
+
+										if (ImGui::CalcTextSize(ShieldStats.c_str()).x > Size.x)
+											Size = ImGui::CalcTextSize(ShieldStats.c_str());
+
+										if (ImGui::CalcTextSize(PosString.c_str()).x > Size.x)
+											Size = ImGui::CalcTextSize(PosString.c_str());
+
+										ImVec2 Begin = { TopRight.X + 35, TopRight.Y - 35 };
+										ImVec2 End = { Begin.x + Size.x, Begin.y + Size.y * 5 };
+
+										ImGui::GetBackgroundDrawList()->AddRect(Begin, { End.x + 2, End.y }, White);
+										ImGui::GetBackgroundDrawList()->AddRectFilled(Begin, { End.x + 2, End.y }, Col);
+										ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y }, White, Target->GetName().c_str());
+
+										ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y }, White, HealthStats.c_str());
+
+										if (MaxShield)
+											ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y * 2 }, White, ShieldStats.c_str());
+										else
+											ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y * 2 }, White, "Shields: No Shields");
+
+										ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y * 3 }, White, PosString.c_str());
+
+										std::string NumBones = "# of Bones: " + std::to_string(Target->Mesh->GetNumBones());
+										ImGui::GetBackgroundDrawList()->AddText({ Begin.x + 2, Begin.y + Size.y * 4 }, White, NumBones.c_str());
+									}
 								}
 							}
 						}
@@ -345,6 +454,9 @@ void GUI::Render()
 				auto SmoothedAngle = CameraRotation + Delta / fSmoothing;
 			
 				pUnreal->PlayerController->SetControlRotation(SmoothedAngle - pUnreal->RecoilControlComponent->TargetRotation, true);
+
+				if (CVA)
+					pUnreal->TargetEnt = CVA;
 			}
 		}
 	}
