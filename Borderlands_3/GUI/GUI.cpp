@@ -155,10 +155,10 @@ void GUI::Render()
 
 
 	// Neto to fix crash here when loading from main menu
-	if (pUnreal->PlayerCameraManager && *pUnreal->PlayerCameraManager->VfTable)
+	if (pUnreal->PlayerCameraManager && *pUnreal->PlayerCameraManager->VfTable && pUnreal->OakPlayerController)
 	{
 		CameraLocation = pUnreal->PlayerCameraManager->GetCameraLocation();
-		CameraRotation = pUnreal->PlayerCameraManager->GetCameraRotation();
+		CameraRotation = pUnreal->OakPlayerController->GetControlRotation();;
 	}
 
 	auto CVADist = FLT_MAX;
@@ -457,6 +457,7 @@ void GUI::Render()
 				auto SmoothedAngle = CameraRotation + Delta / fSmoothing;
 			
 				pUnreal->PlayerController->SetControlRotation(SmoothedAngle - pUnreal->RecoilControlComponent->TargetRotation, true);
+				pUnreal->LocalPlayer->PlayerController->ControlRotation = CameraRotation;
 
 				if (CVA)
 					pUnreal->TargetEnt = CVA;

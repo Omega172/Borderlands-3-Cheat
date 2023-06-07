@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "Fly.h"
+#include "../Unreal.h"
+
+inline std::unique_ptr<Unreal> unreal;
 
 void FlyHack::Run(void** args, size_t numArgs)
 {
@@ -28,6 +31,9 @@ void FlyHack::Run(void** args, size_t numArgs)
 				fOldFlySpeed = OakCharacterMovement->MaxFlySpeed.Value;
 				OakCharacterMovement->MaxFlySpeed.Value = fOldFlySpeed * fSpeed;
 
+				if (bNoClip && unreal.get()->BL3Player->GetActorEnableCollision())
+					unreal.get()->BL3Player->SetActorEnableCollision(false);
+
 				bFlySwitch = true;
 			}
 		}
@@ -37,6 +43,9 @@ void FlyHack::Run(void** args, size_t numArgs)
 			{
 				OakCharacterMovement->MovementMode = CG::EMovementMode::MOVE_Walking;
 				OakCharacterMovement->MaxFlySpeed.Value = fOldFlySpeed;
+
+				if (!unreal.get()->BL3Player->GetActorEnableCollision())
+					unreal.get()->BL3Player->SetActorEnableCollision(true);
 
 				bFlySwitch = false;
 			}

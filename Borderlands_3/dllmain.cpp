@@ -114,6 +114,8 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 		{
 			void* weaponStuffArgs[2] = { pUnreal->RecoilControlComponent, pUnreal->BL3Player->GetActiveWeapon(NULL) };
 			weaponStuff.get()->Run(weaponStuffArgs, 2);
+
+			pUnreal->BL3Player->bCanUseWeaponWhileSprinting = true;
 		}
 
 		if (GetAsyncKeyState(UnloadKey) & 0x1)

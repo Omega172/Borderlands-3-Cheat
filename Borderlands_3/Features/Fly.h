@@ -10,6 +10,7 @@ private:
 
 public:
 	bool bEnabled = false;
+	bool bNoClip = true;
 	float fSpeed = 5.f;
 	KeyBindToggle kbToggle = KeyBindToggle(KeyBind::KeyCode::V);
 
@@ -46,6 +47,7 @@ public:
 		ImGui::Checkbox("FlyHack", &bEnabled);
 		ImGui::SameLine();
 		ImGui::Hotkey("##FlyHack Key", kbToggle, &bSettingKey);
+		ImGui::Checkbox("NoClip", &bNoClip);
 
 		if (bEnabled)
 		{
