@@ -10,6 +10,7 @@
 #include "../Features/SpeedHack.h"
 #include "../Features/GodMode.h"
 #include "../Features/WeaponStuff.h"
+#include "../Features/Fly.h"
 
 inline std::unique_ptr<Unreal> unreal;
 
@@ -19,6 +20,7 @@ bool bWatermarkFPS = true;
 inline std::unique_ptr<SpeedHack> speedHack;
 inline std::unique_ptr<GodMode> godMode;
 inline std::unique_ptr<WeaponStuff> weaponStuff;
+inline std::unique_ptr<FlyHack> flyHack;
 
 bool bESP = true;
 bool bTeamESP = false;
@@ -82,6 +84,7 @@ void GUI::Render()
 
 			godMode.get()->DrawMenuItems();
 			speedHack.get()->DrawMenuItems();
+			flyHack.get()->DrawMenuItems();
 		}
 		ImGui::EndChild();
 		ImGui::SameLine();
@@ -152,7 +155,7 @@ void GUI::Render()
 
 
 	// Neto to fix crash here when loading from main menu
-	if (pUnreal->PlayerCameraManager && pUnreal->PlayerCameraManager->VfTable)
+	if (pUnreal->PlayerCameraManager && *pUnreal->PlayerCameraManager->VfTable)
 	{
 		CameraLocation = pUnreal->PlayerCameraManager->GetCameraLocation();
 		CameraRotation = pUnreal->PlayerCameraManager->GetCameraRotation();

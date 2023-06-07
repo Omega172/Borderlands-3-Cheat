@@ -183,6 +183,7 @@
     <ClInclude Include="Features\WeaponStuff.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GUI\Custom.h" />
+    <ClInclude Include="Features\Fly.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="Unreal.h" />
     <ClInclude Include="GUI\Watermark.h" />
@@ -207,6 +208,7 @@
     <ClCompile Include="Features\GodMode.cpp" />
     <ClCompile Include="Features\SpeedHack.cpp" />
     <ClCompile Include="Features\WeaponStuff.cpp" />
+    <ClCompile Include="Features\Fly.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="ImGUI\imgui.cpp" />
     <ClCompile Include="ImGUI\imgui_demo.cpp" />

@@ -39,7 +39,7 @@ public:
 		if (OakPlayerController)
 			RecoilControlComponent = OakPlayerController->RecoilControlComponent;
 
-		if (PlayerController && !PlayerCameraManager)
+		if (PlayerController && (!PlayerCameraManager || PlayerCameraManager != PlayerController->PlayerCameraManager))
 			PlayerCameraManager = PlayerController->PlayerCameraManager;
 	}
 };

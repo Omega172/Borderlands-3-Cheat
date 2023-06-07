@@ -67,6 +67,9 @@
     <Filter Include="Features\Watermark">
       <UniqueIdentifier>{9b7e4438-62e2-4224-ae1d-68b6834dc6cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Features\Fly">
+      <UniqueIdentifier>{3d852f8d-0df9-4839-a58e-6cab5d0a181b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -140,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="Unreal.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Features\Fly.h">
+      <Filter>Features\Fly</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -218,8 +224,11 @@
     <ClCompile Include="GUI\GUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
+    <ClCompile Include="Features\Fly.cpp">
+      <Filter>Features\Fly</Filter>
+    </ClCompile>
     <ClCompile Include="SDK\GbxGameSystemCore_Package.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>SDK</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

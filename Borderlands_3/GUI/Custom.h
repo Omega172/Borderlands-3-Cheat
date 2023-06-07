@@ -3,297 +3,412 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "../ImGui/imgui_internal.h"
 
-const char* const KeyNames[] = {
-	"Unknown",
-	"VK_LBUTTON",
-	"VK_RBUTTON",
-	"VK_CANCEL",
-	"VK_MBUTTON",
-	"VK_XBUTTON1",
-	"VK_XBUTTON2",
-	"Unknown",
-	"VK_BACK",
-	"VK_TAB",
-	"Unknown",
-	"Unknown",
-	"VK_CLEAR",
-	"VK_RETURN",
-	"Unknown",
-	"Unknown",
-	"VK_SHIFT",
-	"VK_CONTROL",
-	"VK_MENU",
-	"VK_PAUSE",
-	"VK_CAPITAL",
-	"VK_KANA",
-	"Unknown",
-	"VK_JUNJA",
-	"VK_FINAL",
-	"VK_KANJI",
-	"Unknown",
-	"VK_ESCAPE",
-	"VK_CONVERT",
-	"VK_NONCONVERT",
-	"VK_ACCEPT",
-	"VK_MODECHANGE",
-	"VK_SPACE",
-	"VK_PRIOR",
-	"VK_NEXT",
-	"VK_END",
-	"VK_HOME",
-	"VK_LEFT",
-	"VK_UP",
-	"VK_RIGHT",
-	"VK_DOWN",
-	"VK_SELECT",
-	"VK_PRINT",
-	"VK_EXECUTE",
-	"VK_SNAPSHOT",
-	"VK_INSERT",
-	"VK_DELETE",
-	"VK_HELP",
-	"0",
-	"1",
-	"2",
-	"3",
-	"4",
-	"5",
-	"6",
-	"7",
-	"8",
-	"9",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"A",
-	"B",
-	"C",
-	"D",
-	"E",
-	"F",
-	"G",
-	"H",
-	"I",
-	"J",
-	"K",
-	"L",
-	"M",
-	"N",
-	"O",
-	"P",
-	"Q",
-	"R",
-	"S",
-	"T",
-	"U",
-	"V",
-	"W",
-	"X",
-	"Y",
-	"Z",
-	"VK_LWIN",
-	"VK_RWIN",
-	"VK_APPS",
-	"Unknown",
-	"VK_SLEEP",
-	"VK_NUMPAD0",
-	"VK_NUMPAD1",
-	"VK_NUMPAD2",
-	"VK_NUMPAD3",
-	"VK_NUMPAD4",
-	"VK_NUMPAD5",
-	"VK_NUMPAD6",
-	"VK_NUMPAD7",
-	"VK_NUMPAD8",
-	"VK_NUMPAD9",
-	"VK_MULTIPLY",
-	"VK_ADD",
-	"VK_SEPARATOR",
-	"VK_SUBTRACT",
-	"VK_DECIMAL",
-	"VK_DIVIDE",
-	"VK_F1",
-	"VK_F2",
-	"VK_F3",
-	"VK_F4",
-	"VK_F5",
-	"VK_F6",
-	"VK_F7",
-	"VK_F8",
-	"VK_F9",
-	"VK_F10",
-	"VK_F11",
-	"VK_F12",
-	"VK_F13",
-	"VK_F14",
-	"VK_F15",
-	"VK_F16",
-	"VK_F17",
-	"VK_F18",
-	"VK_F19",
-	"VK_F20",
-	"VK_F21",
-	"VK_F22",
-	"VK_F23",
-	"VK_F24",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"VK_NUMLOCK",
-	"VK_SCROLL",
-	"VK_OEM_NEC_EQUAL",
-	"VK_OEM_FJ_MASSHOU",
-	"VK_OEM_FJ_TOUROKU",
-	"VK_OEM_FJ_LOYA",
-	"VK_OEM_FJ_ROYA",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"Unknown",
-	"VK_LSHIFT",
-	"VK_RSHIFT",
-	"VK_LCONTROL",
-	"VK_RCONTROL",
-	"VK_LMENU",
-	"VK_RMENU"
+#include <algorithm>
+#include <array>
+#include <string_view>
+
+class KeyBind {
+public:
+    KeyBind(): keybind{ "" } {};
+    KeyBind(std::string _keybind) : keybind{ _keybind } {};
+    std::string keybind;
+
+    enum KeyCode : unsigned char {
+        APOSTROPHE = 0,
+        COMMA,
+        MINUS,
+        PERIOD,
+        SLASH,
+        KEY_0,
+        KEY_1,
+        KEY_2,
+        KEY_3,
+        KEY_4,
+        KEY_5,
+        KEY_6,
+        KEY_7,
+        KEY_8,
+        KEY_9,
+        SEMICOLON,
+        EQUALS,
+        A,
+        ADD,
+        B,
+        BACKSPACE,
+        C,
+        CAPSLOCK,
+        D,
+        DECIMAL,
+        DEL,
+        DIVIDE,
+        DOWN,
+        E,
+        END,
+        ENTER,
+        F,
+        F1,
+        F10,
+        F11,
+        F12,
+        F2,
+        F3,
+        F4,
+        F5,
+        F6,
+        F7,
+        F8,
+        F9,
+        G,
+        H,
+        HOME,
+        I,
+        INSERT,
+        J,
+        K,
+        L,
+        LALT,
+        LCTRL,
+        LEFT,
+        LSHIFT,
+        M,
+        MOUSE1,
+        MOUSE2,
+        MOUSE3,
+        MOUSE4,
+        MOUSE5,
+        MULTIPLY,
+        MOUSEWHEEL_DOWN,
+        MOUSEWHEEL_UP,
+        N,
+        NONE,
+        NUMPAD_0,
+        NUMPAD_1,
+        NUMPAD_2,
+        NUMPAD_3,
+        NUMPAD_4,
+        NUMPAD_5,
+        NUMPAD_6,
+        NUMPAD_7,
+        NUMPAD_8,
+        NUMPAD_9,
+        O,
+        P,
+        PAGE_DOWN,
+        PAGE_UP,
+        Q,
+        R,
+        RALT,
+        RCTRL,
+        RIGHT,
+        RSHIFT,
+        S,
+        SPACE,
+        SUBTRACT,
+        T,
+        TAB,
+        U,
+        UP,
+        V,
+        W,
+        X,
+        Y,
+        Z,
+        LEFTBRACKET,
+        BACKSLASH,
+        RIGHTBRACKET,
+        BACKTICK,
+
+        MAX
+    };
+
+    //KeyBind() = default;
+    explicit KeyBind(KeyCode keyCode) noexcept;
+    explicit KeyBind(const char* keyName) noexcept;
+
+    bool operator==(KeyCode keyCode) const noexcept { return this->keyCode == keyCode; }
+    friend bool operator==(const KeyBind& a, const KeyBind& b) noexcept { return a.keyCode == b.keyCode; }
+
+    [[nodiscard]] inline const char* toString() const noexcept;
+    [[nodiscard]] inline const int toInt() const noexcept;
+    [[nodiscard]] inline bool isPressed() const noexcept;
+    [[nodiscard]] inline bool isDown() const noexcept;
+    [[nodiscard]] inline bool isSet() const noexcept { return keyCode != KeyCode::NONE; }
+
+    inline bool setToPressedKey() noexcept;
+private:
+    KeyCode keyCode = KeyCode::NONE;
 };
+
+class KeyBindToggle : public KeyBind {
+public:
+    using KeyBind::KeyBind;
+
+    inline void handleToggle() noexcept;
+    [[nodiscard]] inline bool isToggled() const noexcept { return toggledOn; }
+private:
+    bool toggledOn = true;
+};
+
+struct Key {
+    constexpr Key(std::string_view name, int code) : name{ name }, code{ code } {  }
+
+    std::string_view name;
+    int code;
+};
+
+// indices must match KeyBind::KeyCode enum
+inline static constexpr auto keyMap = std::to_array<Key>({
+    { "'", VK_OEM_7 },
+    { ",", VK_OEM_COMMA },
+    { "-", VK_OEM_MINUS },
+    { ".", VK_OEM_PERIOD },
+    { "/", VK_OEM_2 },
+    { "0", '0' },
+    { "1", '1' },
+    { "2", '2' },
+    { "3", '3' },
+    { "4", '4' },
+    { "5", '5' },
+    { "6", '6' },
+    { "7", '7' },
+    { "8", '8' },
+    { "9", '9' },
+    { ";", VK_OEM_1 },
+    { "=", VK_OEM_PLUS },
+    { "A", 'A' },
+    { "ADD", VK_ADD },
+    { "B", 'B' },
+    { "BACKSPACE", VK_BACK },
+    { "C", 'C' },
+    { "CAPSLOCK", VK_CAPITAL },
+    { "D", 'D' },
+    { "DECIMAL", VK_DECIMAL },
+    { "DELETE", VK_DELETE },
+    { "DIVIDE", VK_DIVIDE },
+    { "DOWN", VK_DOWN },
+    { "E", 'E' },
+    { "END", VK_END },
+    { "ENTER", VK_RETURN },
+    { "F", 'F' },
+    { "F1", VK_F1 },
+    { "F10", VK_F10 },
+    { "F11", VK_F11 },
+    { "F12", VK_F12 },
+    { "F2", VK_F2 },
+    { "F3", VK_F3 },
+    { "F4", VK_F4 },
+    { "F5", VK_F5 },
+    { "F6", VK_F6 },
+    { "F7", VK_F7 },
+    { "F8", VK_F8 },
+    { "F9", VK_F9 },
+    { "G", 'G' },
+    { "H", 'H' },
+    { "HOME", VK_HOME },
+    { "I", 'I' },
+    { "INSERT", VK_INSERT },
+    { "J", 'J' },
+    { "K", 'K' },
+    { "L", 'L' },
+    { "LALT", VK_LMENU },
+    { "LCTRL", VK_LCONTROL },
+    { "LEFT", VK_LEFT },
+    { "LSHIFT", VK_LSHIFT },
+    { "M", 'M' },
+    { "MOUSE1", 0 },
+    { "MOUSE2", 1 },
+    { "MOUSE3", 2 },
+    { "MOUSE4", 3 },
+    { "MOUSE5", 4 },
+    { "MULTIPLY", VK_MULTIPLY },
+    { "MWHEEL_DOWN", 0 },
+    { "MWHEEL_UP", 0 },
+    { "N", 'N' },
+    { "NONE", 0 },
+    { "NUMPAD_0", VK_NUMPAD0 },
+    { "NUMPAD_1", VK_NUMPAD1 },
+    { "NUMPAD_2", VK_NUMPAD2 },
+    { "NUMPAD_3", VK_NUMPAD3 },
+    { "NUMPAD_4", VK_NUMPAD4 },
+    { "NUMPAD_5", VK_NUMPAD5 },
+    { "NUMPAD_6", VK_NUMPAD6 },
+    { "NUMPAD_7", VK_NUMPAD7 },
+    { "NUMPAD_8", VK_NUMPAD8 },
+    { "NUMPAD_9", VK_NUMPAD9 },
+    { "O", 'O' },
+    { "P", 'P' },
+    { "PAGE_DOWN", VK_NEXT },
+    { "PAGE_UP", VK_PRIOR },
+    { "Q", 'Q' },
+    { "R", 'R' },
+    { "RALT", VK_RMENU },
+    { "RCTRL", VK_RCONTROL },
+    { "RIGHT", VK_RIGHT },
+    { "RSHIFT", VK_RSHIFT },
+    { "S", 'S' },
+    { "SPACE", VK_SPACE },
+    { "SUBTRACT", VK_SUBTRACT },
+    { "T", 'T' },
+    { "TAB", VK_TAB },
+    { "U", 'U' },
+    { "UP", VK_UP },
+    { "V", 'V' },
+    { "W", 'W' },
+    { "X", 'X' },
+    { "Y", 'Y' },
+    { "Z", 'Z' },
+    { "[", VK_OEM_4 },
+    { "\\", VK_OEM_5 },
+    { "]", VK_OEM_6 },
+    { "`", VK_OEM_3 }
+    });
+
+static_assert(keyMap.size() == KeyBind::MAX);
+static_assert(std::ranges::is_sorted(keyMap, {}, & Key::name));
+
+inline KeyBind::KeyBind(KeyCode keyCode) noexcept : keyCode{ static_cast<std::size_t>(keyCode) < keyMap.size() ? keyCode : KeyCode::NONE } {}
+
+inline KeyBind::KeyBind(const char* keyName) noexcept
+{
+    if (const auto it = std::ranges::lower_bound(keyMap, keyName, {}, &Key::name); it != keyMap.end() && it->name == keyName)
+        keyCode = static_cast<KeyCode>(std::distance(keyMap.begin(), it));
+    else
+        keyCode = KeyCode::NONE;
+}
+
+inline const char* KeyBind::toString() const noexcept
+{
+    return keyMap[static_cast<std::size_t>(keyCode) < keyMap.size() ? keyCode : KeyCode::NONE].name.data();
+}
+
+inline const int KeyBind::toInt() const noexcept
+{
+    return keyMap[static_cast<std::size_t>(keyCode) < keyMap.size() ? keyCode : KeyCode::NONE].code; //Key::code
+}
+
+inline bool KeyBind::isPressed() const noexcept
+{
+    if (keyCode == KeyCode::NONE)
+        return false;
+
+    if (keyCode == KeyCode::MOUSEWHEEL_DOWN)
+        return ImGui::GetIO().MouseWheel < 0.0f;
+
+    if (keyCode == KeyCode::MOUSEWHEEL_UP)
+        return ImGui::GetIO().MouseWheel > 0.0f;
+
+    if (keyCode >= KeyCode::MOUSE1 && keyCode <= KeyCode::MOUSE5)
+        return ImGui::IsMouseClicked(keyMap[keyCode].code);
+
+    return static_cast<std::size_t>(keyCode) < keyMap.size() && ImGui::IsKeyPressed(static_cast<ImGuiKey>(keyMap[keyCode].code), false);
+}
+
+inline bool KeyBind::isDown() const noexcept
+{
+    if (keyCode == KeyCode::NONE)
+        return false;
+
+    if (keyCode == KeyCode::MOUSEWHEEL_DOWN)
+        return ImGui::GetIO().MouseWheel < 0.0f;
+
+    if (keyCode == KeyCode::MOUSEWHEEL_UP)
+        return ImGui::GetIO().MouseWheel > 0.0f;
+
+    if (keyCode >= KeyCode::MOUSE1 && keyCode <= KeyCode::MOUSE5)
+        return ImGui::IsMouseDown(keyMap[keyCode].code);
+
+    return static_cast<std::size_t>(keyCode) < keyMap.size() && ImGui::IsKeyDown(static_cast<ImGuiKey>(keyMap[keyCode].code));
+}
+
+inline bool KeyBind::setToPressedKey() noexcept
+{
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+        keyCode = KeyCode::NONE;
+        return true;
+    }
+    else if (ImGui::GetIO().MouseWheel < 0.0f) {
+        keyCode = KeyCode::MOUSEWHEEL_DOWN;
+        return true;
+    }
+    else if (ImGui::GetIO().MouseWheel > 0.0f) {
+        keyCode = KeyCode::MOUSEWHEEL_UP;
+        return true;
+    }
+    else if (GetKeyState(keyMap[LSHIFT].code) & 0x8000) {
+        keyCode = KeyCode::LSHIFT;
+        return true;
+    }
+    else if (GetKeyState(keyMap[LALT].code) & 0x8000) {
+        keyCode = KeyCode::LALT;
+        return true;
+    }
+    else if (GetKeyState(keyMap[LCTRL].code) & 0x8000) {
+        keyCode = KeyCode::LCTRL;
+        return true;
+    }
+    else if (GetKeyState(keyMap[MOUSE4].code) & 0x8000) {
+        keyCode = KeyCode::MOUSE4;
+        return true;
+    }
+    else if (GetKeyState(keyMap[MOUSE5].code) & 0x8000) {
+        keyCode = KeyCode::MOUSE5;
+        return true;
+    }
+
+    for (int i = 0; i < IM_ARRAYSIZE(ImGui::GetIO().MouseDown); ++i) {
+        if (ImGui::IsMouseClicked(i)) {
+            keyCode = KeyCode(KeyCode::MOUSE1 + i);
+            return true;
+        }
+    }
+
+    for (int i = 0; i < IM_ARRAYSIZE(ImGui::GetIO().KeysDown); ++i) {
+        if (!ImGui::IsKeyPressed(static_cast<ImGuiKey>(i)))
+            continue;
+
+        if (const auto it = std::ranges::find(keyMap, i, &Key::code); it != keyMap.end()) {
+            keyCode = static_cast<KeyCode>(std::distance(keyMap.begin(), it));
+            // Treat AltGr as RALT
+            if (keyCode == KeyCode::LCTRL && ImGui::IsKeyPressed(static_cast<ImGuiKey>(keyMap[KeyCode::RALT].code)))
+                keyCode = KeyCode::RALT;
+            return true;
+        }
+    }
+    return false;
+}
+
+inline void KeyBindToggle::handleToggle() noexcept
+{
+    if (isPressed())
+        toggledOn = !toggledOn;
+}
 
 namespace ImGui
 {
-	inline bool Hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0, 0));
-}
+    inline void Hotkey(const char* label, KeyBind& key, bool *setting, const ImVec2& size = { 100.0f, 0.0f }) noexcept
+    {
+        const auto id = ImGui::GetID(label);
+        ImGui::PushID(label);
 
-inline bool ImGui::Hotkey(const char* label, int* k, const ImVec2& size_arg)
-{
-	ImGuiWindow* window = ImGui::GetCurrentWindow();
-	if (window->SkipItems)
-		return false;
+        std::string BtnName = (*setting) ? "..." : key.toString();
 
-	ImGuiContext& g = *GImGui;
-	ImGuiIO& io = g.IO;
-	const ImGuiStyle& style = g.Style;
+        if (ImGui::GetActiveID() == id) {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetColorU32(ImGuiCol_ButtonActive));
+            ImGui::Button("...", size);
+            ImGui::PopStyleColor();
 
-	const ImGuiID id = window->GetID(label);
-	const ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
-	ImVec2 size = ImGui::CalcItemSize(size_arg, ImGui::CalcItemWidth(), label_size.y + style.FramePadding.y * 2.0f);
-	const ImRect frame_bb(window->DC.CursorPos + ImVec2(label_size.x + style.ItemInnerSpacing.x, 0.0f), window->DC.CursorPos + size);
-	const ImRect total_bb(window->DC.CursorPos, frame_bb.Max);
+            ImGui::GetCurrentContext()->ActiveIdAllowOverlap = true;
+            if ((!ImGui::IsItemHovered() && ImGui::GetIO().MouseClicked[0]) || key.setToPressedKey())
+            {
+                ImGui::ClearActiveID();
+                *setting = false;
+            }
+        }
+        else if (ImGui::Button(BtnName.c_str(), size) || *setting) {
+            ImGui::SetActiveID(id, ImGui::GetCurrentWindow());
+            *setting = true;
+        }
 
-	ImGui::ItemSize(total_bb, style.FramePadding.y);
-	if (!ImGui::ItemAdd(total_bb, id))
-		return false;
-
-	const bool focus_requested = ImGui::FocusableItemRegister(window, id);
-	const bool focus_requested_by_code = focus_requested && (g.NavActivateId == id);
-	const bool focus_requested_by_tab = focus_requested && !focus_requested_by_code;
-
-	const bool hovered = ImGui::ItemHoverable(frame_bb, id);
-
-	if (hovered) {
-		ImGui::SetHoveredID(id);
-		g.MouseCursor = ImGuiMouseCursor_TextInput;
-	}
-
-	const bool user_clicked = hovered && io.MouseClicked[0];
-
-	if (focus_requested || user_clicked) {
-		if (g.ActiveId != id) {
-			// Start edition
-			memset(io.MouseDown, 0, sizeof(io.MouseDown));
-			memset(io.KeysDown, 0, sizeof(io.KeysDown));
-			*k = 0;
-		}
-		ImGui::SetActiveID(id, window);
-		ImGui::FocusWindow(window);
-	}
-	else if (io.MouseClicked[0]) {
-		// Release focus when we click outside
-		if (g.ActiveId == id)
-			ImGui::ClearActiveID();
-	}
-
-	bool value_changed = false;
-	int key = *k;
-
-	if (g.ActiveId == id) {
-		for (auto i = 0; i < 5; i++) {
-			if (io.MouseDown[i]) {
-				switch (i) {
-				case 0:
-					key = VK_LBUTTON;
-					break;
-				case 1:
-					key = VK_RBUTTON;
-					break;
-				case 2:
-					key = VK_MBUTTON;
-					break;
-				case 3:
-					key = VK_XBUTTON1;
-					break;
-				case 4:
-					key = VK_XBUTTON2;
-					break;
-				}
-				value_changed = true;
-				ImGui::ClearActiveID();
-			}
-		}
-		if (!value_changed) {
-			for (auto i = VK_BACK; i <= VK_RMENU; i++) {
-				if (io.KeysDown[i]) {
-					key = i;
-					value_changed = true;
-					ImGui::ClearActiveID();
-				}
-			}
-		}
-
-		if (IsKeyPressedMap(ImGuiKey_Escape)) {
-			*k = 0;
-			ImGui::ClearActiveID();
-		}
-		else {
-			*k = key;
-		}
-	}
-
-	// Render
-	// Select which buffer we are going to display. When ImGuiInputTextFlags_NoLiveEdit is Set 'buf' might still be the old value. We Set buf to NULL to prevent accidental usage from now on.
-
-	char buf_display[64] = "None";
-
-	ImGui::RenderFrame(frame_bb.Min, frame_bb.Max, ImGui::GetColorU32(ImVec4(0.62f, 0.38f, 0.66f, 0.54f)), true, style.FrameRounding);
-
-	if (*k != 0 && g.ActiveId != id) {
-		strcpy_s(buf_display, KeyNames[*k]);
-	}
-	else if (g.ActiveId == id) {
-		strcpy_s(buf_display, "<Press a key>");
-	}
-
-	const ImRect clip_rect(frame_bb.Min.x, frame_bb.Min.y, frame_bb.Min.x + size.x, frame_bb.Min.y + size.y); // Not using frame_bb.Max because we have adjusted size
-	ImVec2 render_pos = frame_bb.Min + style.FramePadding;
-	ImGui::RenderTextClipped(frame_bb.Min + style.FramePadding, frame_bb.Max - style.FramePadding, buf_display, NULL, NULL, style.ButtonTextAlign, &clip_rect);
-	//RenderTextClipped(frame_bb.Min + style.FramePadding, frame_bb.Max - style.FramePadding, buf_display, NULL, NULL, GetColorU32(ImGuiCol_Text), style.ButtonTextAlign, &clip_rect);
-	//draw_window->DrawList->AddText(g.Font, g.FontSize, render_pos, GetColorU32(ImGuiCol_Text), buf_display, NULL, 0.0f, &clip_rect);
-
-	if (label_size.x > 0)
-		ImGui::RenderText(ImVec2(total_bb.Min.x, frame_bb.Min.y + style.FramePadding.y), label);
-
-	return value_changed;
+        ImGui::PopID();
+    }
 }

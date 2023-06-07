@@ -7,6 +7,7 @@
 #include "Features/SpeedHack.h"
 #include "Features/GodMode.h"
 #include "Features/WeaponStuff.h"
+#include "Features/Fly.h"
 
 #include <chrono>
 #include <thread>
@@ -28,6 +29,7 @@ inline std::unique_ptr<Unreal> unreal = std::make_unique<Unreal>();
 inline std::unique_ptr<SpeedHack> speedHack = std::make_unique<SpeedHack>();
 inline std::unique_ptr<GodMode> godMode = std::make_unique<GodMode>();
 inline std::unique_ptr<WeaponStuff> weaponStuff = std::make_unique<WeaponStuff>();
+inline std::unique_ptr<FlyHack> flyHack = std::make_unique<FlyHack>();
 
 bool Init()
 {
@@ -71,6 +73,7 @@ bool Init()
 	speedHack.get()->Setup();
 	godMode.get()->Setup();
 	weaponStuff.get()->Setup();
+	flyHack.get()->Setup();
 
 	return true;
 }
@@ -95,8 +98,10 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 
 		if (pUnreal->OakCharacterMovement)
 		{
-			void* speedHackArgs[1] = { pUnreal->OakCharacterMovement };
-			speedHack.get()->Run(speedHackArgs, 1);
+			void* movementArgs[1] = { pUnreal->OakCharacterMovement };
+			speedHack.get()->Run(movementArgs, 1);
+
+			flyHack.get()->Run(movementArgs, 1);
 		}
 
 		if (pUnreal->AcknowledgedPawn)

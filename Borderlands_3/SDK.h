@@ -16,6 +16,9 @@
 #include <cstdint>
 #include <Windows.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "ImGUI/imgui.h"
 #include "ImGui/imgui_impl_win32.h"
