@@ -445,6 +445,21 @@ void GUI::Render()
 							}
 						}
 					}
+
+					// Chams Testing
+					auto MaterialGlow = Target->Mesh->GetCustomGlowMaterial();
+					auto MaterialMask = Target->Mesh->GetCustomMaskMaterial();
+
+					if (MaterialGlow != nullptr || MaterialMask != nullptr)
+						__debugbreak();
+
+					//auto NumMats = Target->Mesh->GetNumMaterials();
+					//std::cout << "NumMats: " << NumMats << std::endl;
+
+					//auto SlotNames = Target->Mesh->GetMaterialSlotNames();
+
+					//for (int i = 0; i < SlotNames.Count(); i++)
+						//std::cout << i << "\t" << SlotNames[i].GetName() << std::endl;
 				}
 			}
 		}

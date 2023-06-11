@@ -122,7 +122,14 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 			bShouldRun = false;
 
 		if (GetAsyncKeyState(MenuKey) & 0x1)
+		{
 			GUI::bMenuOpen = !GUI::bMenuOpen;
+
+			ImGui::GetIO().MouseDrawCursor = GUI::bMenuOpen;
+
+			if (ImGui::GetIO().MouseDrawCursor)
+				SetCursor(NULL);
+		}
 
 		if (GetAsyncKeyState(VK_MBUTTON) & 0x1)
 		{
