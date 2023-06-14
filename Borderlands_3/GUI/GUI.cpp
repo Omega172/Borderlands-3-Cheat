@@ -446,15 +446,43 @@ void GUI::Render()
 						}
 					}
 
-					// Chams Testing
-					auto MaterialGlow = Target->Mesh->GetCustomGlowMaterial();
-					auto MaterialMask = Target->Mesh->GetCustomMaskMaterial();
+					// Chams + Stencil testing
+					auto NumMats = Target->GbxMesh->GetNumMaterials();
+					for (int i = 0; i < NumMats; i++)
+					{
+						CG::UMaterialInterface* Mat = Target->GbxMesh->GetMaterial(i);
+						CG::UMaterialInstanceDynamic* DynamicMat = (CG::UMaterialInstanceDynamic*)Mat;
 
-					if (MaterialGlow != nullptr || MaterialMask != nullptr)
-						__debugbreak();
+						if (DynamicMat && DynamicMat->VectorParameterValues.Data())
+						{
+							for (int j = 0; j < DynamicMat->VectorParameterValues.Count(); j++)
+							{
+								if (!DynamicMat->VectorParameterValues.IsValidIndex(j))
+									continue;
 
-					//auto NumMats = Target->Mesh->GetNumMaterials();
-					//std::cout << "NumMats: " << NumMats << std::endl;
+								CG::FVectorParameterValue Value = DynamicMat->VectorParameterValues[j];
+
+								Value.ParameterValue.R = 1.f;
+								Value.ParameterValue.G = 1.f;
+								Value.ParameterValue.B = 1.f;
+								Value.ParameterValue.A = 1.f;
+
+								DynamicMat->SetVectorParameterValue(Value.ParameterInfo.Name, Value.ParameterValue);
+								//DynamicMat->GetBaseMaterial()->MaterialDomain;
+							}
+
+							Target->GbxMesh->SetRenderCustomDepth(true);
+							Target->GbxMesh->SetCustomDepthStencilValue(255);
+							Target->GbxMesh->SetCustomDepthStencilWriteMask(CG::ERendererStencilMask::ERSM_Default);
+
+							Target->GbxMesh->CustomColorValueView0 = { 1.f, 1.f, 1.f, 1.f };
+							Target->GbxMesh->CustomColorValueView1 = { 1.f, 1.f, 1.f, 1.f };
+							Target->GbxMesh->CustomColorValueView2 = { 1.f, 1.f, 1.f, 1.f };
+							Target->GbxMesh->CustomColorValueView3 = { 1.f, 1.f, 1.f, 1.f };
+
+							Target->GbxMesh->SetMaterial(i, DynamicMat);
+						}
+					}
 
 					//auto SlotNames = Target->Mesh->GetMaterialSlotNames();
 

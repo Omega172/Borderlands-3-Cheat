@@ -12,7 +12,7 @@ public:
 	bool bEnabled = false;
 	bool bNoClip = true;
 	float fSpeed = 5.f;
-	KeyBindToggle kbToggle = KeyBindToggle(KeyBind::KeyCode::V);
+	KeyBindToggle kbToggle = KeyBindToggle(KeyBind::KeyCode::H);
 
 private:
 	float fOldFlySpeed = 0.0f;
