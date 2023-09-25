@@ -36,7 +36,7 @@ namespace CG
 	 */
 	bool InitSdk()
 	{
-		return InitSdk(L"Borderlands3.exe", 0x69EBDB0, 0x69E71E8, 0x6B1C668);
+		return InitSdk(L"Borderlands3.exe", 0x69ECDB0, 0x69E81E8, 0x6B1D668);
 	}
 
 	// --------------------------------------------------
